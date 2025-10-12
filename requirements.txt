@@ -1,0 +1,16 @@
+asgiref3.8.1
+blinker1.9.0
+click8.1.8
+colorama0.4.6
+Django5.2.3
+djangorestframework3.16.0
+Flask3.1.0
+flask-cors5.0.1
+itsdangerous2.2.0
+Jinja23.1.6
+MarkupSafe3.0.2
+pillow11.2.1
+pip24.3.1
+sqlparse0.5.3
+tzdata2025.2
+Werkzeug3.1.3

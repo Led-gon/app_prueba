@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Shatalito - Dashboard</title>
+<link rel="stylesheet" href="{% static 'caja/style.css' %}">
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>
+      {% if role == 'Empleado' %}Panel de Empleado
+      {% elif role == 'Administrador' %}Panel de Administrador
+      {% else %}Panel de Super Usuario{% endif %}
+    </h1>
+    <div class="user-info">
+      Usuario: {{ user.username }} ({{ user.role }})
+      <form id="logoutForm" action="{% url 'caja:logout' %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Cerrar Sesión</button>
+      </form>
+    </div>
+  </header>
+
+  <nav class="dashboard-nav">
+    {% if sections.orders_management %}<button class="nav-button active" data-target="ordersManagementSection">Manejo de Pedidos</button>{% endif %}
+    {% if sections.orders %}<button class="nav-button" data-target="ordersSection">Pedidos</button>{% endif %}
+    {% if sections.products %}<button class="nav-button" data-target="productsSection">Productos</button>{% endif %}
+    {% if sections.users %}<button class="nav-button" data-target="usersSection">Usuarios</button>{% endif %}
+  </nav>
+
+  {% if sections.orders %}
+  <section id="ordersSection" class="dashboard-content active">
+    <h2>Gestión de Pedidos</h2>
+    <div class="filters">
+      <label>Fecha: <input type="date" id="filterDate"></label>
+      <label>Estado:
+        <select id="filterStatus">
+          <option value="">Todos</option>
+          <option value="1">Pendiente</option>
+          <option value="2">En Preparación</option>
+          <option value="3">Listo para Entregar</option>
+          <option value="4">Entregado</option>
+          <option value="5">Cancelado</option>
+        </select>
+      </label>
+      <button id="applyFiltersButton">Filtrar</button>
+    </div>
+    <table id="ordersTable">
+      <thead><tr><th>ID</th><th>Cliente</th><th>Mesa</th><th>Fecha</th><th>Estado</th><th>Total</th><th>Acciones</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p id="ordersMessage" class="message"></p>
+  </section>
+  {% endif %}
+
+  {% if sections.orders_management %}
+  <section id="ordersManagementSection" class="dashboard-content">
+    <h2>Pedidos Listos para Entregar</h2>
+    <div id="readyOrdersCards"></div>
+    <p id="ordersManagementMessage" class="message"></p>
+  </section>
+  {% endif %}
+
+  {% if sections.products %}
+  <section id="productsSection" class="dashboard-content">
+    <h2>Gestión de Productos</h2>
+    <nav class="products-subnav">
+      <button class="subnav-button active-subtab" data-target="productsListSection">Listado</button>
+      <button class="subnav-button" data-target="productsAddSection">Añadir</button>
+      <button class="subnav-button" data-target="productsStockSection">Stock</button>
+    </nav>
+    <div class="tabs__panels flow">
+      <section id="productsListSection" class="product-content active-subtab">
+        <h3>Listado de Productos</h3>
+        <button id="listProductsButton">Cargar Productos</button>
+        <table id="productsTable">
+          <thead><tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Stock</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p id="productsListMessage" class="message"></p>
+      </section>
+      <section id="productsAddSection" class="product-content">
+        <h3>Nuevo Producto</h3>
+        <input id="newProductName" type="text" placeholder="Nombre">
+        <textarea id="newProductDescription" placeholder="Descripción" rows="2"></textarea>
+        <input id="newProductPrice" type="number" step="0.01" placeholder="Precio">
+        <input id="newProductStock" type="number" placeholder="Stock">
+        <select id="newProductCategory">
+          <option value="">Categoría</option>
+          <option value="1">Bebidas</option>
+          <option value="2">Minutas</option>
+          <option value="3">Entradas</option>
+          <option value="4">Platos principales</option>
+          <option value="5">Postres</option>
+        </select>
+        <input id="newProductImage" type="file" accept="image/*">
+        <button id="addProductButton">Guardar</button>
+        <p id="addProductMessage" class="message"></p>
+      </section>
+      <section id="productsStockSection" class="product-content">
+        <h3>Modificar Stock</h3>
+        <input id="searchProductNameStock" type="text" placeholder="Nombre producto">
+        <button id="searchProductStockButton">Buscar</button>
+        <div id="productStockDetails"></div>
+        <p id="modifyProductStockMessage" class="message"></p>
+      </section>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if sections.users %}
+  <section id="usersSection" class="dashboard-content">
+    <h2>Gestión de Usuarios</h2>
+    <nav class="users-subnav">
+      <button class="subnav-button active-subtab" data-target="usersListSection">Listado</button>
+      <button class="subnav-button" data-target="usersAddSection">Añadir</button>
+      <button class="subnav-button" data-target="usersModifySection">Modificar</button>
+    </nav>
+    <div class="tabs__panels flow">
+      <section id="usersListSection" class="users-content active-subtab">
+        <h3>Usuarios</h3>
+        <button id="listUsersButton">Cargar Usuarios</button>
+        <table id="usersTable">
+          <thead><tr><th>Username</th><th>Rol</th><th>Acciones</th></tr></thead>
+          <tbody id="usersTableBody"><tr><td colspan="3">Pulsa "Cargar Usuarios".</td></tr></tbody>
+        </table>
+        <p id="usersListMessage" class="message"></p>
+      </section>
+      <section id="usersAddSection" class="users-content">
+        <h3>Nuevo Usuario</h3>
+        <input id="newUsername" type="text" placeholder="Usuario">
+        <input id="newUserPassword" type="password" placeholder="Contraseña">
+        <select id="newUserRole">
+          <option value="">Rol</option>
+          <option value="Empleado">Empleado</option>
+          <option value="Administrador">Administrador</option>
+          <option value="Super Usuario">Super Usuario</option>
+        </select>
+        <button id="createUserButton">Crear</button>
+        <p id="createUserMessage" class="message"></p>
+      </section>
+      <section id="usersModifySection" class="users-content">
+        <h3>Modificar Usuario</h3>
+        <input id="modifyUsernameSearch" type="text" placeholder="Usuario">
+        <button id="searchUserToModifyButton">Buscar</button>
+        <div id="modifyUserDetails" style="display:none;">
+          <p>Editando: <strong id="editingUsername"></strong></p>
+          <select id="modifyUserRole">
+            <option value="">Mantener Rol</option>
+            <option value="Empleado">Empleado</option>
+            <option value="Administrador">Administrador</option>
+            <option value="Super Usuario">Super Usuario</option>
+          </select>
+          <input id="modifyUserPassword" type="password" placeholder="Nueva contraseña">
+          <button id="submitUserModificationButton">Actualizar</button>
+        </div>
+        <p id="modifyUserMessage" class="message"></p>
+      </section>
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<script>
+const API_URLS = {
+  login: "{% url 'caja:login' %}",
+  session_status: "{% url 'caja:api_session_status' %}",
+  orders_list_create: "{% url 'caja:api_orders_list_create' %}",
+  order_detail_update_delete: "{% url 'caja:api_order_detail_update_delete' order_id=12345 %}",
+  products_list_create: "{% url 'caja:api_products_list_create' %}",
+  get_product_by_name: "{% url 'caja:api_get_product_by_name' %}",
+  update_product_stock: "{% url 'caja:api_update_product_stock' product_id=0 %}",
+  api_superuser_users_list_create: "{% url 'caja:api_superuser_users_list_create' %}",
+  api_superuser_modify_user: "{% url 'caja:api_superuser_modify_user' username='0' %}"
+};
+</script>
+<script src="{% static 'caja/admin_dashboard_django.js' %}"></script>
+</body>
+</html>

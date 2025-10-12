@@ -1,0 +1,45 @@
+{% extends 'cliente/base.html' %}
+{% load static %}
+
+{% block titulo %}
+Shatalito - Menu
+{% endblock %}
+
+{% block Subtitulo %}Nuestro Menu{% endblock %}
+
+{% block contenido %}
+<main class="menu-principal">
+    {% for categoria, productos in categorias_con_productos %}
+    <section class="categoria">
+        <h2>{{ categoria.name }}</h2>
+        <ul class="lista-platos">
+            {% for producto in productos %}
+            <li class="plato-item">
+                {% if producto.image %}
+                    <a href="{% url 'cliente:detalle_producto' table producto.id %}">
+                        <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
+                    </a>
+                {% endif %}
+                <div>
+                    <h3>{{ producto.name }}</h3>
+                    <p class="descripcion">{{ producto.description }}</p>
+                    <p class="precio">${{ producto.price }}</p>
+                    <button class="agregar-carrito"
+                        data-id="{{ producto.id }}"
+                        data-nombre="{{ producto.name }}"
+                        data-precio="{{ producto.price }}">
+                        Agregar al Carrito
+                    </button>
+                    <div class="control-cantidad" data-id="{{ producto.id }}" style="display: none;">
+                        <button class="menos">-</button>
+                        <span class="cantidad">1</span>
+                        <button class="mas">+</button>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endfor %}
+</main>
+{% endblock %}

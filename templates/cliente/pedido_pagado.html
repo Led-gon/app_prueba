@@ -1,0 +1,21 @@
+{% extends 'cliente/base.html' %}
+{% load static %}
+
+{% block titulo %}
+Shatalito - Pedido Pagado
+{% endblock %}
+
+{% block Subtitulo %}¡Pedido Confirmado!{% endblock %}
+
+{% block contenido %}
+    <main class="pedido-pagado-principal">
+        <section class="mensaje-confirmacion">
+            <h2>Gracias por tu pedido.</h2>
+            <p>Tu pedido ha sido procesado con éxito.</p>
+            <p>Número de Pedido: <span id="numero-pedido">{{ pedido.id }}</span></p>
+            <p>Recibirás un correo electrónico con los detalles de tu pedido.</p>
+            <a href="{% url 'cliente:index' table=table %}" class="button">Volver al Inicio</a>
+        </section>
+    </main>
+
+{% endblock %}

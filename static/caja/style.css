@@ -1,0 +1,504 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+h1, h2, h3 {
+    color: #2c3e50;
+}
+
+h1 {
+    font-size: 1.8em;
+}
+
+.user-info {
+    font-size: 0.9em;
+}
+
+.user-info span {
+    font-weight: bold;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="number"],
+input[type="file"],
+textarea,
+select {
+    width: calc(100% - 22px); /* Account for padding and border */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Ajusta el espacio entre columnas en las tablas de productos y usuarios */
+#productsTable th, #productsTable td,
+#usersTable th, #usersTable td {
+    padding: 4px 14px; /* Más espacio horizontal y vertical */
+    text-align: center; /* Centra el texto */
+    border: .1px solid #9191919d;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#logoutButton {
+    background-color: #e74c3c;
+    margin-left: 10px;
+}
+#logoutButton:hover {
+    background-color: #c0392b;
+}
+
+.message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+}
+.message.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
+.message.error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+}
+.message:empty {
+    display: none;
+}
+
+
+.filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #ecf0f1;
+    border-radius: 4px;
+    display: flex;
+    gap: 15px; /* Spacing between filter elements */
+    align-items: center;
+}
+
+.filters label {
+    margin-bottom: 0; /* Adjust for inline display */
+}
+.filters input[type="date"], .filters select {
+    margin-bottom: 0; /* Adjust for inline display */
+    width: auto; /* Allow them to size based on content or specific widths */
+}
+
+
+#ordersTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#ordersTable th, #ordersTable td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+#ordersTable th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+}
+
+#ordersTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+#ordersTable tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.admin-section, .superuser-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #3498db;
+}
+.admin-section h2, .superuser-section h2 {
+    color: #3498db;
+}
+
+.admin-section > div, .superuser-section > div {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fdfdfe;
+    border: 1px solid #e0e6e8;
+    border-radius: 5px;
+}
+
+.login-container { /* Específico para centrar mejor el login */
+    max-width: 400px;
+    margin-top: 50px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.user-info button {
+    margin-left: 10px;
+}
+
+.filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #ecf0f1;
+    border-radius: 4px;
+    display: flex;
+    flex-wrap: wrap; /* Para que se ajusten en pantallas pequeñas */
+    gap: 10px;
+    align-items: center;
+}
+.filters label { margin-bottom: 0; }
+.filters input, .filters select, .filters button {
+    margin-bottom: 0; /* Reset margin for inline elements */
+    padding: 8px;
+}
+
+
+/* Estilos para secciones en dashboards */
+.dashboard-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #e0e6e8;
+    border-radius: 5px;
+    background-color: #fdfdfd;
+}
+.dashboard-section h2 {
+    margin-top: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    color: #3498db;
+}
+
+/* Product Management Layout */
+.product-management > div, .user-management > div {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    /* border-bottom: 1px dashed #ccc; */
+}
+.product-management > div:last-child, .user-management > div:last-child {
+    border-bottom: none;
+}
+
+/* Superuser Dashboard Navigation */
+.dashboard-nav {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+.nav-button {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin-right: 5px;
+    border-bottom: none; /* For tab-like appearance */
+    border-radius: 4px 4px 0 0;
+}
+.nav-button.active {
+    background-color: #fff;
+    border-bottom: 1px solid #fff; /* Makes it look like it merges with content */
+    font-weight: bold;
+    color: #3498db;
+}
+.dashboard-content {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-top: none; /* Part of tab effect */
+    border-radius: 0 0 4px 4px;
+}
+.dashboard-content.active {
+    display: block;
+}
+
+/* Action buttons in tables */
+#ordersTable .action-button, #usersTableSU .action-button {
+    padding: 5px 8px;
+    font-size: 0.85em;
+    margin-right: 5px;
+}
+#ordersTable .action-button.cancel {
+    background-color: #e74c3c;
+}
+#ordersTable .action-button.cancel:hover {
+    background-color: #c0392b;
+}
+
+.dashboard-nav {
+    margin-bottom: 20px;
+}
+.nav-button {
+    padding: 10px 20px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+    font-weight: bold;
+}
+.nav-button.active {
+    background: #fff;
+    border-bottom: 2px solid #007bff;
+    color: #007bff;
+}
+.dashboard-content {
+    display: none;
+}
+.dashboard-content.active {
+    display: block;
+}
+
+/* Products Subnavigation */
+.products-subnav {
+    margin-bottom: 15px;
+}
+.subnav-button {
+    padding: 10px 20px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+    font-weight: bold;
+}
+.subnav-button.active-subtab {
+    background: #fff;
+    border-bottom: 2px solid #007bff;
+    color: #007bff;
+}
+
+.product-content {
+    display: none;
+}
+.product-content.active-subtab {
+    display: block;
+}
+
+#productsSection:not(.active) .products-subnav,
+#productsSection:not(.active) .product-content {
+    display: none !important;
+}
+
+
+/* Users Subnavigation */
+.users-subnav {
+    margin-bottom: 15px;
+}
+.subnav-button {
+    padding: 10px 20px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+    font-weight: bold;
+}
+.subnav-button.active-subtab {
+    background: #fff;
+    border-bottom: 2px solid #007bff;
+    color: #007bff;
+}
+
+.users-content {
+    display: none;
+}
+.users-content.active-subtab {
+    display: block;
+}
+
+#usersSection:not(.active) .products-subnav,
+#usersSection:not(.active) .product-content,
+#usersSection:not(.active) .users-content {
+    display: none !important;
+}
+
+#usersSection .users-content.active-subtab {
+    display: block !important;
+}
+
+#usersTable .action-button.delete-button {
+    background-color: #e74c3c !important;
+    color: #fff !important;
+}
+#usersTable .action-button.delete-button:hover {
+    background-color: #c0392b !important;
+}
+#usersTable .action-button.modify-button {
+    background-color: #3498db !important;
+    color: #fff !important;
+}
+
+.action-button.modify-button,
+.action-button.delete-button {
+    margin-left: 5px;
+    padding: 4px 10px;
+    font-size: 0.9em;
+    min-width: 70px;
+    height: 28px;
+}
+
+/* Estilos para un modal genérico personalizado */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000; /* Asegura que esté por encima de todo */
+}
+
+.custom-modal-content {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    text-align: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.custom-modal-content p {
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.modal-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.modal-button.primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.modal-button.primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+.modal-button.secondary {
+    background-color: #ecf0f1;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.modal-button.secondary:hover {
+    background-color: #bdc3c7;
+    transform: translateY(-1px);
+}
+
+/* Grilla para las tarjetas de pedidos listos para entregar */
+#readyOrdersCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 18px;
+}
+
+.order-card {
+    size-adjust: 100%;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+}
+.order-card h3 {
+    margin-top: 0;
+}
+.order-card ul {
+    margin: 8px 0 12px 0;
+    padding-left: 18px;
+}
+.deliver-btn {
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.deliver-btn:hover {
+    background: #219150;
+}

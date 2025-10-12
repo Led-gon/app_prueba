@@ -1,0 +1,27 @@
+
+{% extends 'cliente/base.html' %}
+{% load static %}
+
+{% block titulo %}
+Shatalito - Carrito de Compras
+{% endblock %}
+
+{% block Subtitulo %}Tu carrito de compras{% endblock %}
+
+{% block contenido %}
+
+    <main class="carrito-principal">
+        <section id="lista-de-productos-carrito">
+            <p>Tu carrito está vacío.</p>
+        </section>
+
+        <section class="resumen-carrito">
+            
+           <!--<p>Subtotal: $<span id="subtotal">0.00</span></p>-->  
+            <!--  <p>Envío: $<span id="envio">0.00</span></p> -->
+            <p class="total">Total: $<span id="total">0.00</span></p>
+            <button class="button" id="ir-a-pagar">Ir a Pagar</button>
+        </section>
+    </main>
+
+{% endblock %}

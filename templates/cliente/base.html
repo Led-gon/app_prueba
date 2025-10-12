@@ -1,0 +1,74 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+    <head>
+        <title>{% block titulo %}  {% endblock  %}</title>
+        <!-- Required meta tags -->
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+
+        <!-- Bootstrap CSS v5.2.1 -->
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+            crossorigin="anonymous"
+        />
+            <!-- CSS -->
+        <link rel="stylesheet" href="{%static 'cliente/style.css' %}">
+        <link rel="stylesheet" href="{%static 'cliente/contacto_estilos.css' %}">
+
+        {% block extra_css %}{% endblock %}
+    </head>
+
+    <body>        
+<header class="custom-header">
+    <h1>{% block Subtitulo %}  {% endblock  %}</h1>
+    <nav class="navbar navbar-expand navbar-dark">
+        <div class="nav navbar-nav mx-auto">
+            <a class="nav-item nav-link active" href="{% url 'cliente:index' table %}">Inicio</a>
+            <a class="nav-item nav-link active" href="{% url 'cliente:menu' table %}">Menu</a>
+            <a class="nav-item nav-link active" href="{% url 'cliente:ayuda' table %}">Ayuda</a>
+            <a class="nav-item nav-link active" href="{% url 'cliente:contacto' table %}">Contacto</a>
+            <a class="nav-item nav-link active" href="{% url 'cliente:carrito' table %}">
+                Carrito <img src="{% static 'cliente/imagen/carrito.jpg' %}" alt="Carrito" style="width:24px;height:24px;">(<span id="cantidad-items-carrito">0</span>)
+            </a>
+        </div>
+    </nav>
+</header>
+        
+        <main>
+        <h1>{% block Subtitulo1 %}  {% endblock  %}</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    {% block contenido  %}{% endblock  %}
+                </div>
+            </div>        
+        </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2025 Shatalito</p>
+        </footer>
+        <!-- Bootstrap JavaScript Libraries -->
+        <script
+            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"
+        ></script>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+            integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+            crossorigin="anonymous"
+        ></script>
+
+        <!-- JS -->
+        <script src="{% static 'cliente/script.js' %}" defer></script>
+
+    </body>
+</html>

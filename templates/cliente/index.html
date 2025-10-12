@@ -1,0 +1,30 @@
+{% extends 'cliente/base.html' %}
+{% load static %}
+
+{% block titulo %}
+Shatalito - Menu
+{% endblock %}
+
+{% block Subtitulo %}¡Bienvenido!{% endblock %}
+
+{% block contenido %}
+    <main>
+        <section class="hero">
+            <h2>Bienvenido a Nuestro Restaurante</h2>
+            <p>Descubre nuestros deliciosos platos y realiza tu pedido en línea.</p>
+            <a href="{% url 'cliente:menu' table %}" class="button">Ver el Menú</a>
+        </section>
+        <section class="carrousel-destacados">
+            <h3>Nuestros Platos Estrella</h3>
+                <div class="carousel-container">
+                    <div class="carousel-slide">
+                        {% for producto in destacados %}
+                            <a href="{% url 'cliente:detalle_producto' table producto.id %}">
+                                <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+        </section>
+    </main>
+{% endblock %}

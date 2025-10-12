@@ -1,0 +1,112 @@
+[
+    {
+        "model": "caja.Order",
+        "pk": 1,
+        "fields": {
+            "amount": "12000.00",
+            "status": 1,
+            "IP": null,
+            "initialTime": "2023-10-01T12:00:00Z",
+            "endTime": "2023-10-01T12:00:00Z",
+            "order_date": "2023-10-01",
+            "customer_name": "",
+            "tableNumber": 4
+        }
+    },
+    {
+        "model": "caja.Order",
+        "pk": 2,
+        "fields": {
+            "amount": "6500.00",
+            "status": 3,
+            "IP": null,
+            "initialTime": "2023-10-01T12:00:00Z",
+            "endTime": "2023-10-01T12:00:00Z",
+            "order_date": "2023-10-01",
+            "customer_name": "",
+            "tableNumber": 2
+        }
+    },
+    {
+        "model": "caja.Order",
+        "pk": 3,
+        "fields": {
+            "amount": "28500.00",
+            "status": 2,
+            "IP": null,
+            "initialTime": "2023-10-01T12:00:00Z",
+            "endTime": "2023-10-01T12:00:00Z",
+            "order_date": "2023-10-01",
+            "customer_name": "",
+            "tableNumber": 1
+        }
+    },
+    {
+        "model": "caja.OrderItem",
+        "pk": 1,
+        "fields": {
+            "product": 1,
+            "order": 1,
+            "price": "3000.00",
+            "sugerency": "",
+            "quantity": 4
+        }
+    },
+    {
+        "model": "caja.OrderItem",
+        "pk": 2,
+        "fields": {
+            "product": 1,
+            "order": 2,
+            "price": "3000.00",
+            "sugerency": "",
+            "quantity": 1
+        }
+    },
+    {
+        "model": "caja.OrderItem",
+        "pk": 3,
+        "fields": {
+            "product": 5,
+            "order": 2,
+            "price": "3000.00",
+            "sugerency": "",
+            "quantity": 1
+        }
+    },
+    {
+        "model": "caja.OrderItem",
+        "pk": 4,
+        "fields": {
+            "product": 1,
+            "order": 3,
+            "price": "3000.00",
+            "sugerency": "",
+            "quantity": 3
+        }
+    },
+    {
+        "model": "caja.OrderItem",
+        "pk": 5,
+        "fields": {
+            "product": 3,
+            "order": 3,
+            "price": "15000.00",
+            "sugerency": "",
+            "quantity": 1
+        }
+    },
+    {
+        "model": "caja.OrderItem",
+        "pk": 6,
+        "fields": {
+            "product": 4,
+            "order": 3,
+            "price": "4500.00",
+            "sugerency": "",
+            "quantity": 1
+        }
+    }
+
+
+]

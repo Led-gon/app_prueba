@@ -1,0 +1,153 @@
+.formulario-contacto {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
+  .formulario-contacto h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2em;
+    color: #333;
+  }
+
+  .campo-formulario {
+    margin-bottom: 20px;
+  }
+
+  .campo-formulario label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: bold;
+  }
+
+  .campo-formulario input,
+  .campo-formulario select,
+  .campo-formulario textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+  }
+
+  .campo-formulario textarea {
+    resize: vertical;
+  }
+
+  .boton-enviar {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background-color: #006341;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2em;
+    cursor: pointer;
+  }
+
+  .boton-enviar:hover {
+    background-color: #004d32;
+  }
+
+  .info-contacto {
+    max-width: 800px;
+    margin: 50px auto;
+    text-align: center;
+  }
+
+  .info-contacto h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  .info-contacto p {
+    margin: 5px 0;
+    font-size: 1em;
+    color: #666;
+  }
+
+  .redes-sociales {
+    margin-top: 30px;
+  }
+
+  .redes-sociales a {
+    margin: 0 10px;
+    font-size: 1.8em;
+    color: #006341;
+    text-decoration: none;
+  }
+
+  .redes-sociales a:hover {
+    color: #004d32;
+  }
+
+  .seccion-contacto {
+    max-width: 1200px;
+    margin: 50px auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+  }
+
+  .formulario-contacto, .info-contacto {
+    flex: 1;
+    min-width: 300px;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
+  .formulario-contacto form {
+display: flex;
+flex-direction: column;
+gap: 15px;
+}
+
+.campo-formulario {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.campo-formulario label {
+width: 150px;
+font-weight: bold;
+}
+
+.campo-formulario input,
+.campo-formulario select,
+.campo-formulario textarea {
+flex: 1;
+padding: 8px;
+border: 1px solid #ccc;
+border-radius: 4px;
+}
+
+.checkboxes {
+display: flex;
+flex-direction: column;
+gap: 8px;
+}
+
+button[type="submit"] {
+padding: 10px 20px;
+background-color: #008037;
+color: white;
+border: none;
+border-radius: 5px;
+font-size: 16px;
+cursor: pointer;
+}
+
+button[type="submit"]:hover {
+background-color: #00682b;
+}
+

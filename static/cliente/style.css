@@ -1,0 +1,610 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6; /* Mejora la legibilidad del texto */
+}
+
+/* Header completo con el estilo antiguo */
+.custom-header {
+    background-color: #000;
+    color: white;
+    text-align: center;
+    padding: 1em;
+}
+
+/* H1 dentro del header */
+.custom-header h1 {
+    margin: 0;             /* Elimina los márgenes por defecto */
+    font-size: 2em;        /* Ajusta al tamaño anterior */
+    font-weight: normal;   /* Igual que antes, podés poner bold si querés */
+    line-height: 1.2;
+}
+
+/* Nav links */
+.custom-header .nav-link {
+    color: white !important;        /* Sobre escribe estilos de Bootstrap */
+    padding: 0.5em 1em;
+    border-radius: 5px;
+}
+
+/* Hover links */
+.custom-header .nav-link:hover {
+    background-color: #333;
+}
+
+main {
+    margin: 2%;
+    padding: 15px; /* Reduje el padding general para pantallas más pequeñas */
+    margin-bottom: 60px; /* Ajustá según el alto del footer */
+
+}
+
+.hero {
+    background-color: #eee;
+    padding: 1.5em; /* Reduje el padding para pantallas más pequeñas */
+    text-align: center;
+    margin-bottom: 15px; /* Reduje el margen inferior */
+}
+
+.button {
+    display: inline-block;
+    background-color: #5cb85c;
+    color: white;
+    padding: 0.8em 1.5em; /* Ajusté el padding del botón */
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: none; /* Buena práctica para botones */
+    cursor: pointer; /* Indica que es interactivo */
+}
+
+.button-ayuda {
+    display: inline-block;
+    background-color: #5cb85c;
+    color: white;
+    padding: 0.2em 0.6em; /* Ajusté el padding del botón */
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 10px;
+    border: none; /* Buena práctica para botones */
+    cursor: pointer; /* Indica que es interactivo */
+    font-size: 80%;
+}
+
+.menu-principal img {
+    width: 220px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+.menu-principal .categoria {
+    margin-bottom: 15px; /* Reduje el margen inferior */
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px; /* Reduje el padding inferior */
+}
+
+.menu-principal img {
+    max-width: 50%;
+    min-width: 20%; /* Asegura que la imagen no sea demasiado pequeña */
+    height: auto;
+    border-radius: 3%; /* Bordes redondeados para las imágenes */
+    margin-bottom: 10px; /* Espacio entre la imagen y el texto */
+}
+
+.lista-platos {
+    list-style: none;
+    padding: 0;
+    display: grid; /* Utilizo grid para una disposición más flexible de los platos */
+    grid-template-columns: repeat(auto-fit, minmax(100px, 300px)); /* Crea columnas que se ajustan al ancho, mínimo 300px */
+    gap: 1em; /* Espacio entre los platos */
+}
+
+.plato-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 0; /* Ya no es necesario con el gap del grid */
+    display: flex;
+    flex-direction: column; /* Apila los elementos dentro del plato en columnas */
+    align-items: stretch; /* Estira los elementos internos para ocupar todo el ancho */
+}
+
+.plato-item img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 0.5em; /* Espacio entre la imagen y el texto */
+}
+
+.plato-item h3 {
+    margin-top: 0;
+    font-size: 1.2em; /* Ajusté el tamaño de la fuente */
+}
+
+.precio {
+    font-weight: bold;
+    color: #d9534f;
+    margin-bottom: 0.5em; /* Añadí un poco de espacio */
+}
+
+.agregar-carrito {
+    background-color: #f0ad4e;
+    color: white;
+    border: none;
+    padding: 0.6em 1.2em; /* Ajusté el padding del botón */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em; /* Ajusté el tamaño de la fuente */
+    margin-top: auto; /* Empuja el botón hacia abajo en el plato */
+}
+
+.item-carrito {
+    display: grid;
+    grid-template-columns: 2fr 1fr 2fr 0.7fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.item-carrito span,
+.item-carrito input {
+    margin: 0;
+}
+
+.item-carrito button {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0;
+}
+
+.item-carrito button:hover {
+    background-color: #ff1a1a;
+}
+
+.carrito-principal #lista-de-productos-carrito {
+    margin-bottom: 15px; /* Reduje el margen inferior */
+    border: 1px solid #ddd;
+    padding: 10px; /* Reduje el padding */
+}
+
+.resumen-carrito {
+    border: 1px solid #ddd;
+    padding: 10px; /* Reduje el padding */
+    background-color: #f9f9f9;
+}
+
+.total {
+    font-weight: bold;
+    font-size: 1.1em; /* Ajusté el tamaño de la fuente */
+    margin-top: 10px;
+}
+
+.datos-pago form div {
+    margin-bottom: 10px;
+}
+
+.datos-pago label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 0.95em; /* Ajusté el tamaño de la fuente */
+}
+
+.datos-pago input[type="text"],
+.datos-pago input[type="email"],
+.datos-pago textarea {
+    width: 100%;
+    padding: 0.6em; /* Ajusté el padding */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 0.9em; /* Ajusté el tamaño de la fuente */
+}
+
+footer {
+    background-color: #000000;
+    color: white;
+    text-align: center;
+    padding: 0.8em 0; /* Ajusté el padding */
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 0.85em; /* Ajusté el tamaño de la fuente */
+    padding-bottom: 0%; /* Elimino el padding inferior para evitar desbordamiento */
+}
+
+/* Media Queries para diferentes tamaños de pantalla */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column; /* Apila los enlaces en pantallas pequeñas */
+        align-items: center; /* Centra los enlaces apilados */
+    }
+
+    .lista-platos {
+        grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
+    }
+
+    .plato-item {
+        flex-direction: row; /* Vuelve a la disposición horizontal en pantallas pequeñas para mejor lectura */
+        align-items: center;
+    }
+
+    .plato-item img {
+        width: 100px; /* Tamaño fijo para la imagen en la lista en pantallas pequeñas */
+        height: auto;
+        margin-right: 1em;
+        margin-bottom: 0;
+    }
+
+    .plato-item > div {
+        flex-grow: 1; /* El texto ocupa el espacio restante */
+    }
+
+    .agregar-carrito {
+        font-size: 0.8em;
+        padding: 0.5em 1em;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .lista-platos {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adapta dinámicamente las columnas */
+    }
+}
+
+.carousel-container {
+    width: 100%; 
+    height: 260px; /* Altura del contenedor */
+    display: flex; /* Flex para alinear las imágenes */
+    justify-content: center; /* Centra el contenido del carrusel */
+    overflow: hidden;
+    margin-bottom: 50px;
+    position: relative;
+    --carousel-container-width: calc(100%); /* Ancho del contenedor */
+    
+}
+
+.carousel-slide {
+    --num-imagenes: 8; /* Número de imágenes a mostrar */
+    --imagen-ancho: 250px; /* Ancho de cada imagen */
+    --margen-imagenes: 10px; /* Margen entre imágenes */
+    --ancho-total-franja: calc(var(--num-imagenes) * var(--imagen-ancho) + (var(--num-imagenes) - 1) * var(--margen-imagenes));
+    width: 90%; /* Ancho del contenedor */
+    height: 90%; /* Altura del contenedor */
+    display: flex; /* Flex para alinear las imágenes */
+    animation: desplazamientoIdaVuelta 10s linear infinite alternate; /* Animación de desplazamiento */
+    animation-play-state: running; /* Estado de la animación por defecto */
+    will-change: transform;  /* Mejora el rendimiento al indicar que se va a transformar */
+    height: auto;
+    position: absolute;
+
+}
+
+@keyframes desplazamientoIdaVuelta {
+    0% {
+        /* Comienza con la lista de imágenes a la derecha */
+        transform: translateX(0%);
+    }
+    100% {
+        /* La última imagen completamente a la izquierda */
+        transform: translateX(calc(-1 * var(--ancho-total-franja) + var(--carousel-container-width)));
+
+        /*transform: translateX(calc(var(--carousel-container-width) - var(--ancho-total-franja)));
+        */
+    }
+}
+
+.carousel-slide img {
+    width: var(--imagen-ancho); /* Ancho de cada imagen */
+    height: var(--imagen-ancho); /* Ajusta la altura según sea necesario */
+    flex-shrink: 0;
+    margin: 0 var(--margen-imagenes);
+    border-radius: 5px;
+    object-fit: cover; /* Para mantener la relación de aspecto y ajustar dentro */
+}
+
+.carousel-slide img:hover {
+    transform: scale(1.1); /* Efecto de zoom al pasar el ratón */
+    transition: transform 0.3s ease; /* Transición suave para el efecto de zoom */
+    backface-visibility: hidden; /* Mejora el rendimiento en algunos navegadores */
+}
+
+.carousel-slide img:first-child {
+    margin-left: 0;
+}
+
+.carousel-slide img:last-child {
+    margin-right: 0;
+}
+
+
+.carousel-slide:hover {
+    animation-play-state: paused; /* Pausa la animación al pasar el ratón */
+}
+
+/* ----------------------------Ejemplo----------------------------------------------- */
+
+/* estilos_monitor.css */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.main-content {
+    flex-grow: 1; /* Hace que el contenido principal crezca para ocupar el espacio restante */
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.pedido-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pedido-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.numero-pedido {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.numero-mesa {
+    font-size: 0.9em;
+    color: #777;
+}
+
+.items-pedido {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0;
+}
+
+.items-pedido li {
+    font-size: 0.95em;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.pedido-item.listo {
+    background-color: #e6ffe6;
+    border-color: #8fbc8f;
+}
+
+.pedido-item.listo .mensaje-listo {
+    font-weight: bold;
+    color: #2e8b57;
+}
+
+#lista-espera, #lista-listos {
+    list-style: none;
+    padding: 0;
+}
+
+footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    color: #777;
+    font-size: 0.9em;
+    width: 100%;
+    position: fixed;
+}
+
+img[data-image-key] {
+    min-width: var(--imagen-ancho); /* Ancho mínimo de la imagen */
+    min-height: var(--imagen-ancho);
+    display: inline-block; /* O block según necesites */
+    background-color: #eee; /* Un color de fondo mientras carga */
+  }
+
+
+.ayuda-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.ayuda-seccion {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 1rem;
+}
+
+.pregunta {
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  transition: color 0.3s;
+}
+
+
+
+.flecha {
+  transition: transform 0.3s ease;
+}
+
+.flecha.abierta {
+    transform: rotate(90deg);
+}
+
+.respuesta {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, padding 0.3s ease;
+  padding: 0 10px;
+}
+
+.respuesta.abierta {
+  max-height: 500px; /* suficiente para mostrar el contenido */
+  padding: 10px 10px;
+}
+
+
+.pagar-principal {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centrar horizontalmente el contenido */
+            padding: 15px;
+        }
+
+        #resumen-pedido {
+            width: 90%; /* Ocupar un porcentaje del ancho para responsividad */
+            max-width: 600px; /* Ancho máximo para pantallas grandes */
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-sizing: border-box; /* Incluir padding y border en el ancho */
+        }
+
+        .datos-pago {
+            width: 90%; /* Ocupar un porcentaje del ancho para responsividad */
+            max-width: 600px; /* Ancho máximo para pantallas grandes */
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-sizing: border-box; /* Incluir padding y border en el ancho */
+        }
+
+        .datos-pago form div {
+            margin-bottom: 10px;
+        }
+
+        .datos-pago label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .datos-pago input[type="number"],
+        .datos-pago input[type="text"] {
+            width: 100%;
+            padding: 0.6em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.9em;
+        }
+
+        .datos-pago small {
+            display: block;
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 3px;
+        }
+
+        .datos-pago button[type="submit"] {
+            width: 100%;
+            padding: 0.8em;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        .datos-pago button[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Media query para pantallas más grandes (opcional: para un diseño lado a lado) */
+        @media (min-width: 769px) {
+            .pagar-principal {
+                flex-direction: row;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            #resumen-pedido,
+            .datos-pago {
+                width: 45%; /* Ocupar casi la mitad del ancho en pantallas más grandes */
+                max-width: none; /* Eliminar el ancho máximo para el diseño lado a lado */
+            }
+
+            .datos-pago button[type="submit"] {
+                width: auto; /* Ajustar el ancho del botón al contenido */
+            }
+        }
+
+        /* Estilos para el modal de confirmación */
+        #modal-confirmacion-pago {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #modal-confirmacion-pago .contenido-modal {
+            background: #fff;
+            padding: 2em;
+            border-radius: 8px;
+            max-width: 350px;
+            margin: auto;
+            text-align: center;
+        }
+
+        #modal-confirmacion-pago h3 {
+            margin-top: 0;
+        }
+
+        #modal-confirmacion-pago button {
+            margin-top: 10px;
+        }

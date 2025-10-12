@@ -1,0 +1,100 @@
+[
+    {
+        "model": "caja.State",
+        "pk": 1,
+        "fields": {
+            "name": "Pendiente"
+        }
+    },
+    {
+        "model": "caja.State",
+        "pk": 2,
+        "fields": {
+            "name": "En Preparación"
+        }
+    },
+    {
+        "model": "caja.State",
+        "pk": 3,
+        "fields": {
+            "name": "Listo para Entregar"
+        }
+    },
+    {
+        "model": "caja.State",
+        "pk": 4,
+        "fields": {
+            "name": "Entregado"
+        }
+    },
+    {
+        "model": "caja.State",
+        "pk": 5,
+        "fields": {
+            "name": "Cancelado"
+        }
+    },
+    {
+        "model": "caja.PaymentMethod",	
+        "pk": 1,
+        "fields": {
+            "name": "Efectivo"
+        }
+    },
+    {
+        "model": "caja.PaymentMethod",
+        "pk": 2,
+        "fields": {
+            "name": "Tarjeta de Crédito"
+        }
+    },
+    {
+        "model": "caja.PaymentMethod",
+        "pk": 3,
+        "fields": {
+            "name": "Tarjeta de Debito"
+        }
+    },
+    {
+        "model": "caja.PaymentMethod",
+        "pk": 4,
+        "fields": {
+            "name": "Billetera Electrónica"
+        }
+    },
+    {
+        "model": "caja.PaymentMethod",
+        "pk": 5,
+        "fields": {
+            "name": "Dividir Cuenta"
+        }
+    },
+    {
+        "model": "caja.PaymentStatus",
+        "pk": 1,
+        "fields": {
+            "name": "Aprobado"
+        }
+    },
+    {
+        "model": "caja.PaymentStatus",
+        "pk": 2,
+        "fields": {
+            "name": "Rechazado"
+        }
+    },
+    {
+        "model": "caja.PaymentStatus",
+        "pk": 3,
+        "fields": {
+            "name": "Reembolsado"
+        }
+    },
+    {
+        "model": "caja.PaymentStatus",
+        "pk": 4,
+        "fields": {
+            "name": "Pendiente"
+        }
+    }
+]

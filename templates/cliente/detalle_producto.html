@@ -1,0 +1,33 @@
+{% extends 'cliente/base.html' %}
+{% load static %}
+
+{% block titulo %}
+Shatalito - Detalle Producto
+{% endblock %}
+
+{% block Subtitulo %}Detalle del Producto{% endblock %}
+
+{% block contenido %}
+
+    <main>
+        <section>
+            {% if producto.image %}
+                <img src="{{ producto.image.url }}" alt="{{ producto.name }}" style="max-width:400px;">
+            {% endif %}
+            <h2>{{ producto.name }}</h2>
+            <p>{{ producto.description }}</p>
+            <p><strong>Precio:</strong> ${{ producto.price }}</p>
+            <button class="agregar-carrito"
+                data-id="{{ producto.id }}"
+                data-nombre="{{ producto.name }}"
+                data-precio="{{ producto.price }}">
+                Agregar al Carrito
+            </button>
+            <div class="control-cantidad" data-id="{{ producto.id }}" style="display: none;">
+                        <button class="menos">-</button>
+                        <span class="cantidad">1</span>
+                        <button class="mas">+</button>
+            </div>
+        </section>
+    </main>
+{% endblock %}

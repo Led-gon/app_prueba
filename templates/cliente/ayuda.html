@@ -1,0 +1,119 @@
+{% extends "cliente/base.html" %}
+{% load static %}
+
+{% block titulo %}Ayuda{% endblock %}
+
+{% block Subtitulo %}Ayuda y Soporte{% endblock %}
+
+{% block contenido %}
+<main>
+      <div class="ayuda-container">
+        <h1>Centro de Ayuda</h1>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">📱¿Cómo hacer un pedido desde mi mesa? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              1. Escaneá el código QR de tu mesa para ingresar al menú digital del restaurante.<br>
+              2. Elegí los productos que querés y agregalos al <a class="button-ayuda" href="{% url 'cliente:carrito' table %}">Carrito</a>.<br>
+              3. Realizá el pago y esperá la confirmación.<br>
+              4. ¡Listo! Tu pedido será procesado y entregado en la mesa.
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">🧾¿Dónde veo el resumen de mi pedido? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              Podés ver el resumen en la sección <a class="button-ayuda" href="/mispedidos">Mis pedidos</a>.<br>
+              Allí encontrarás los productos que pediste, el total y el estado del pedido.
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">✏️¿Puedo editar mi pedido luego de enviarlo? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              Una vez enviado el pedido, <strong>no puede modificarse desde la app</strong>.<br>
+              Si necesitás hacer un cambio urgente, contactá al personal del restaurante o usá la opción de ayuda en la app.
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">⏱️¿Cuánto tarda en llegar mi pedido? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              El tiempo de entrega varía según la cantidad de pedidos y la preparación.<br>              
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">📡El QR no funciona, ¿qué hago? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              Si el código QR no funciona:<br>
+              - Verificá que tu cámara esté habilitada.<br>
+              - Probá con otro lector QR o navegador.<br>
+              - Si sigue sin funcionar, pedile ayuda a un mozo o ingresá manualmente la URL que figura debajo del código.
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">🧍¿El mozo me traerá el pedido? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              Sí. Una vez preparado, el personal del restaurante <strong>llevará tu pedido directamente a tu mesa</strong>, según el número registrado por el QR que escaneaste.
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">📤¿Qué pasa si me equivoqué al mandar el pedido? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              Si detectaste un error después de enviar el pedido, avisale lo antes posible a un mozo.<br>
+              <strong>Cuanto antes informes el error, más fácil será corregirlo.</strong>
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">💳¿Cómo se realiza el pago? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              Podés pagar de las siguientes formas:<br>
+              - Desde la app: con billetera virtual o dividir cuenta.<br>
+              - En persona: en efectivo o con tarjeta de débito o crédito.<br>
+              Elegí la opción que prefieras al confirmar tu pedido.
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">🔐¿Mis datos están protegidos? <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              Sí. Utilizamos conexiones seguras (HTTPS) y cumplimos con las normas de protección de datos vigentes.<br>
+              Tu información personal y de pago está <strong>cifrada</strong> y no se comparte con terceros.
+            </p>
+          </div>
+        </section>
+
+        <section class="ayuda-seccion">
+          <h2 class="pregunta">📞Necesito ayuda en el momento <i class="fa-solid fa-chevron-right flecha"></i></h2>
+          <div class="respuesta">
+            <p>
+              Si necesitás asistencia inmediata:<br>              
+              - Llamá al personal del restaurante.<br>
+              Estamos para ayudarte con cualquier inconveniente.
+            </p>
+          </div>
+        </section>
+      </div>
+  </main>
+{% endblock %}
