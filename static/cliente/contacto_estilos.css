@@ -1,153 +1,239 @@
+/* === ESTRUCTURA GENERAL === */
+.seccion-contacto {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: #f9fafb;
+}
+
+.formulario-contacto,
+.info-contacto {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* === FORMULARIO === */
 .formulario-contacto {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 30px;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
+  flex: 1 1 420px;
+  max-width: 600px;
+}
 
-  .formulario-contacto h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 2em;
-    color: #333;
-  }
-
-  .campo-formulario {
-    margin-bottom: 20px;
-  }
-
-  .campo-formulario label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-    font-weight: bold;
-  }
-
-  .campo-formulario input,
-  .campo-formulario select,
-  .campo-formulario textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
-  }
-
-  .campo-formulario textarea {
-    resize: vertical;
-  }
-
-  .boton-enviar {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    background-color: #006341;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.2em;
-    cursor: pointer;
-  }
-
-  .boton-enviar:hover {
-    background-color: #004d32;
-  }
-
-  .info-contacto {
-    max-width: 800px;
-    margin: 50px auto;
-    text-align: center;
-  }
-
-  .info-contacto h3 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-    color: #333;
-  }
-
-  .info-contacto p {
-    margin: 5px 0;
-    font-size: 1em;
-    color: #666;
-  }
-
-  .redes-sociales {
-    margin-top: 30px;
-  }
-
-  .redes-sociales a {
-    margin: 0 10px;
-    font-size: 1.8em;
-    color: #006341;
-    text-decoration: none;
-  }
-
-  .redes-sociales a:hover {
-    color: #004d32;
-  }
-
-  .seccion-contacto {
-    max-width: 1200px;
-    margin: 50px auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 40px;
-  }
-
-  .formulario-contacto, .info-contacto {
-    flex: 1;
-    min-width: 300px;
-    background: #ffffff;
-    border-radius: 10px;
-    padding: 30px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-
-  .formulario-contacto form {
-display: flex;
-flex-direction: column;
-gap: 15px;
+.formulario-contacto h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
 }
 
 .campo-formulario {
-display: flex;
-align-items: center;
-gap: 10px;
+  margin-bottom: 1rem;
 }
 
 .campo-formulario label {
-width: 150px;
-font-weight: bold;
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.3rem;
 }
 
 .campo-formulario input,
 .campo-formulario select,
 .campo-formulario textarea {
-flex: 1;
-padding: 8px;
-border: 1px solid #ccc;
-border-radius: 4px;
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
+.campo-formulario input:focus,
+.campo-formulario select:focus,
+.campo-formulario textarea:focus {
+  border-color: #2563eb;
+  outline: none;
+}
+
+/* === CHECKBOXES === */
 .checkboxes {
-display: flex;
-flex-direction: column;
-gap: 8px;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
-button[type="submit"] {
-padding: 10px 20px;
-background-color: #008037;
-color: white;
-border: none;
-border-radius: 5px;
-font-size: 16px;
-cursor: pointer;
+.checkboxes label {
+  font-size: 0.9rem;
+  color: #374151;
 }
 
-button[type="submit"]:hover {
-background-color: #00682b;
+/* === BOTÓN === */
+.boton-enviar {
+  width: 100%;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
 }
 
+.boton-enviar:hover {
+  background-color: #1e40af;
+  transform: translateY(-2px);
+}
+
+/* === MENSAJES === */
+.exito {
+  text-align: center;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.error {
+  text-align: center;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* === INFO CONTACTO === */
+.info-contacto {
+  flex: 1 1 320px;
+  max-width: 400px;
+  background: #ffffff;
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+  align-self: flex-start;
+}
+
+.bloque-contacto {
+  margin-bottom: 1.8rem;
+}
+
+.bloque-contacto h3 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.bloque-contacto p {
+  color: #374151;
+  font-size: 1rem;
+  margin: 0.3rem 0;
+}
+
+/* Redes sociales */
+/* === ÍCONOS RESPONSIVE === */
+.redes-sociales {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.redes-sociales a {
+  font-size: 1.8rem; /* tamaño por defecto escritorio */
+  transition: transform 0.2s, color 0.2s;
+}
+
+.redes-sociales a:hover {
+  color: #1e40af;
+  transform: scale(1.1);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .seccion-contacto {
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem;
+  }
+
+  .formulario-contacto,
+  .info-contacto {
+    width: 100%;
+    max-width: 95%;
+    padding: 1.5rem;
+  }
+
+  .formulario-contacto h2 {
+    font-size: 1.4rem;
+  }
+
+  .bloque-contacto h3 {
+    font-size: 1.1rem;
+  }
+
+  .bloque-contacto p {
+    font-size: 0.95rem;
+  }
+
+  .redes-sociales a {
+    font-size: 1.4rem;
+  }
+
+    .redes-sociales a {
+    font-size: 1.4rem; /* más chico para celular */
+  }
+
+  .info-contacto {
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .bloque-contacto h3 {
+    font-size: 1.1rem;
+  }
+
+  .bloque-contacto p {
+    font-size: 0.95rem;
+  }
+
+}
+/* 📱 Ajuste extra para pantallas más pequeñas */
+@media (max-width: 480px) {
+  .formulario-contacto,
+  .info-contacto {
+    padding: 1rem;
+  }
+
+  .formulario-contacto h2 {
+    font-size: 1.2rem;
+  }
+
+  .campo-formulario label {
+    font-size: 0.9rem;
+  }
+
+  .campo-formulario input,
+  .campo-formulario select,
+  .campo-formulario textarea {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .boton-enviar {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+  }
+}

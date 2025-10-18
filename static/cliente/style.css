@@ -39,15 +39,37 @@ main {
     margin: 2%;
     padding: 15px; /* Reduje el padding general para pantallas más pequeñas */
     margin-bottom: 60px; /* Ajustá según el alto del footer */
-
 }
 
+.main-container {
+    max-width: 1200px;           /* Limita el ancho en pantallas grandes */
+    margin: 0 auto;              /* Centra el contenido */
+    padding: clamp(1rem, 3vw, 2rem); /* Padding adaptable según el ancho de pantalla */
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: clamp(0.9rem, 2.5vw, 1rem); /* Tamaño de texto base adaptable */
+    box-sizing: border-box;      /* Incluye padding en el ancho total */
+}
+
+/* Desktop por defecto */
 .hero {
     background-color: #eee;
     padding: 1.5em; /* Reduje el padding para pantallas más pequeñas */
     text-align: center;
     margin-bottom: 15px; /* Reduje el margen inferior */
 }
+.hero h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+.hero p.lead {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+}
+h3.text-center {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+}
+.custom-header h1 {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+}
+
 
 .button {
     display: inline-block;
@@ -74,15 +96,6 @@ main {
     font-size: 80%;
 }
 
-.menu-principal img {
-    width: 220px;
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    object-fit: cover;
-    display: block;
-    margin: 0 auto;
-}
 
 .menu-principal .categoria {
     margin-bottom: 15px; /* Reduje el margen inferior */
@@ -91,12 +104,13 @@ main {
 }
 
 .menu-principal img {
-    max-width: 50%;
-    min-width: 20%; /* Asegura que la imagen no sea demasiado pequeña */
-    height: auto;
+    width: 100%;
+    max-width: 300px;
     border-radius: 3%; /* Bordes redondeados para las imágenes */
     margin-bottom: 10px; /* Espacio entre la imagen y el texto */
+    height: auto;
 }
+
 
 .lista-platos {
     list-style: none;
@@ -104,6 +118,7 @@ main {
     display: grid; /* Utilizo grid para una disposición más flexible de los platos */
     grid-template-columns: repeat(auto-fit, minmax(100px, 300px)); /* Crea columnas que se ajustan al ancho, mínimo 300px */
     gap: 1em; /* Espacio entre los platos */
+    justify-content: center;
 }
 
 .plato-item {
@@ -113,18 +128,30 @@ main {
     display: flex;
     flex-direction: column; /* Apila los elementos dentro del plato en columnas */
     align-items: stretch; /* Estira los elementos internos para ocupar todo el ancho */
+    border-radius: 5px;
+    background: #fff;
+    gap: 10px; /* separa imagen, texto y botón */
+    box-sizing: border-box;
 }
 
 .plato-item img {
-    max-width: 100%;
+    width: 100%;
+    max-width: 300px;
     height: auto;
     display: block;
-    margin-bottom: 0.5em; /* Espacio entre la imagen y el texto */
+    object-fit: cover;
+    margin-bottom: 10px; /* Espacio entre la imagen y el texto */
 }
 
 .plato-item h3 {
     margin-top: 0;
     font-size: 1.2em; /* Ajusté el tamaño de la fuente */
+}
+
+.plato-item .info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .precio {
@@ -133,6 +160,33 @@ main {
     margin-bottom: 0.5em; /* Añadí un poco de espacio */
 }
 
+.descripcion {
+  overflow: hidden;
+  line-height: 1.3em;           /* Ajustar según tu estilo */
+  max-height: calc(1.3em * 3);  /* Limita a 3 líneas */
+  margin-bottom: 0.5em;
+  transition: max-height 0.3s ease;
+}
+
+.descripcion.expandida {
+  max-height: 1000px;/* Cuando se hace clic en "Ver más" */
+}
+
+
+.descripcion.abierta {
+    max-height: 1000px; /* suficiente para mostrar todo */
+}
+
+/* Botón “Ver más” */
+.ver-mas {
+    display: none; /*se activa en js si esnecesario*/
+    color: #007bff;
+    font-size: 0.85em;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+
 .agregar-carrito {
     background-color: #f0ad4e;
     color: white;
@@ -140,8 +194,10 @@ main {
     padding: 0.6em 1.2em; /* Ajusté el padding del botón */
     border-radius: 5px;
     cursor: pointer;
+    text-align: center;
+    width: 100%;
     font-size: 0.9em; /* Ajusté el tamaño de la fuente */
-    margin-top: auto; /* Empuja el botón hacia abajo en el plato */
+   /* margin-top: auto;  Empuja el botón hacia abajo en el plato */
 }
 
 .item-carrito {
@@ -225,6 +281,11 @@ footer {
     padding-bottom: 0%; /* Elimino el padding inferior para evitar desbordamiento */
 }
 
+.carousel-item img{
+    object-fit: cover;
+    height: 60vh;
+}
+
 /* Media Queries para diferentes tamaños de pantalla */
 @media (max-width: 768px) {
     nav ul {
@@ -234,19 +295,29 @@ footer {
 
     .lista-platos {
         grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
+        gap:10px;
     }
 
     .plato-item {
-        flex-direction: row; /* Vuelve a la disposición horizontal en pantallas pequeñas para mejor lectura */
-        align-items: center;
+        flex-direction: column; /* Vuelve a la disposición horizontal en pantallas pequeñas para mejor lectura */
+        align-items: flex-start;
+        text-align: left;
+        display: flex;
+        gap: 12px;
     }
 
     .plato-item img {
-        width: 100px; /* Tamaño fijo para la imagen en la lista en pantallas pequeñas */
-        height: auto;
-        margin-right: 1em;
-        margin-bottom: 0;
+        width: 100%; /* Tamaño fijo para la imagen en la lista en pantallas pequeñas */
+        max-width: 300px;
+        flex-shrink: 0;
+        height: 200px;
+        border-radius: 8px;
+        object-fit: cover;
     }
+    
+  .producto-info {
+    flex: 1;
+  }
 
     .plato-item > div {
         flex-grow: 1; /* El texto ocupa el espacio restante */
@@ -256,6 +327,54 @@ footer {
         font-size: 0.8em;
         padding: 0.5em 1em;
     }
+    .carousel-item img{
+        height: 40vh;
+    }
+
+    .btn-lg {
+    padding: 0.5rem 1rem;   /* menos padding */
+    font-size: 0.9rem;      /* fuente más chica */
+    }
+
+    .main-container {
+        padding: 0.5rem 1rem;
+        font-size: clamp(0.8rem, 3vw, 0.95rem);
+    }
+
+    .hero h2 {
+        font-size: clamp(1.2rem, 5vw, 1.8rem);
+    }
+
+    .hero p.lead {
+        font-size: clamp(0.9rem, 3vw, 1.1rem);
+    }
+
+    .carrousel-destacados h3 {
+        font-size: clamp(1rem, 4vw, 1.4rem);
+    }
+
+
+.ayuda-container > h1 {
+  font-size: clamp(1.2rem, 5vw, 1.7rem); /* menos grande en celular */
+  margin: 0 0 0.6rem;
+  text-align: center;
+  line-height: 1.15;
+}
+   .ayuda-seccion {
+    padding: 0.5rem;
+   }
+  .pregunta {
+    font-size: 1rem;
+  }
+  .respuesta p {
+    font-size: 0.95rem;
+  }
+
+     main {
+        margin: 0; /* ocupa todo el ancho */
+        padding: 10px; /* padding reducido en móviles */
+    }
+
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -273,66 +392,28 @@ footer {
     margin-bottom: 50px;
     position: relative;
     --carousel-container-width: calc(100%); /* Ancho del contenedor */
-    
 }
 
-.carousel-slide {
-    --num-imagenes: 8; /* Número de imágenes a mostrar */
-    --imagen-ancho: 250px; /* Ancho de cada imagen */
-    --margen-imagenes: 10px; /* Margen entre imágenes */
-    --ancho-total-franja: calc(var(--num-imagenes) * var(--imagen-ancho) + (var(--num-imagenes) - 1) * var(--margen-imagenes));
-    width: 90%; /* Ancho del contenedor */
-    height: 90%; /* Altura del contenedor */
-    display: flex; /* Flex para alinear las imágenes */
-    animation: desplazamientoIdaVuelta 10s linear infinite alternate; /* Animación de desplazamiento */
-    animation-play-state: running; /* Estado de la animación por defecto */
-    will-change: transform;  /* Mejora el rendimiento al indicar que se va a transformar */
-    height: auto;
-    position: absolute;
-
+.carousel-item img{
+    width: 100%;
+    height: 60vh; /* o 40vh en mobile */
+    object-fit: cover;
+    transition: none; /* desactiva cualquier transición de zoom */
 }
 
-@keyframes desplazamientoIdaVuelta {
-    0% {
-        /* Comienza con la lista de imágenes a la derecha */
-        transform: translateX(0%);
-    }
-    100% {
-        /* La última imagen completamente a la izquierda */
-        transform: translateX(calc(-1 * var(--ancho-total-franja) + var(--carousel-container-width)));
 
-        /*transform: translateX(calc(var(--carousel-container-width) - var(--ancho-total-franja)));
-        */
-    }
-}
 
-.carousel-slide img {
-    width: var(--imagen-ancho); /* Ancho de cada imagen */
-    height: var(--imagen-ancho); /* Ajusta la altura según sea necesario */
-    flex-shrink: 0;
-    margin: 0 var(--margen-imagenes);
-    border-radius: 5px;
-    object-fit: cover; /* Para mantener la relación de aspecto y ajustar dentro */
-}
 
+/*
 .carousel-slide img:hover {
-    transform: scale(1.1); /* Efecto de zoom al pasar el ratón */
-    transition: transform 0.3s ease; /* Transición suave para el efecto de zoom */
-    backface-visibility: hidden; /* Mejora el rendimiento en algunos navegadores */
-}
 
-.carousel-slide img:first-child {
-    margin-left: 0;
-}
+    
+    transform: scale(1.1); Efecto de zoom al pasar el ratón 
+    transition: transform 0.3s ease; Transición suave para el efecto de zoom
+    backface-visibility: hidden; 
+    
+}*/
 
-.carousel-slide img:last-child {
-    margin-right: 0;
-}
-
-
-.carousel-slide:hover {
-    animation-play-state: paused; /* Pausa la animación al pasar el ratón */
-}
 
 /* ----------------------------Ejemplo----------------------------------------------- */
 
@@ -421,16 +502,23 @@ h2 {
     padding: 0;
 }
 
+
 footer {
+    background-color: #000;
+    color: white;
     text-align: center;
-    margin-top: 50px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-    color: #777;
-    font-size: 0.9em;
+    padding: 0.8em 0;
     width: 100%;
-    position: fixed;
+    font-size: 0.85em;
 }
+
+@media (min-width: 769px) {
+    footer {
+        position: fixed;
+        bottom: 0;
+    }
+}
+
 
 img[data-image-key] {
     min-width: var(--imagen-ancho); /* Ancho mínimo de la imagen */
@@ -443,25 +531,45 @@ img[data-image-key] {
 .ayuda-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: clamp(0.9rem, 3vw, 1.8rem);
   font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(0.95rem, 1.6vw, 1rem); /* tamaño base dentro del contenedor */
+}
+
+/* Título principal de la página de ayuda */
+.ayuda-container > h1 {
+  font-size: clamp(1.3rem, 4.5vw, 1.9rem);
+  margin: 0 0 0.6rem;
+  text-align: center;
+  line-height: 1.15;
 }
 
 .ayuda-seccion {
   border-bottom: 1px solid #ccc;
-  margin-bottom: 1rem;
+  padding: clamp(0.6rem, 1.8vw, 1rem);
+  border-radius: 8px;
+  background: transparent; /* si querés fondo blanco, pone: #fff */
+  margin-bottom: 0.8rem;
 }
 
 .pregunta {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2.7vw, 1.15rem);
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 0;
+  padding: 0;
   transition: color 0.3s;
+  gap:0.6rem;
+  line-height: 1.2;
 }
 
+/* tamaño de la flecha / icono */
+.pregunta .flecha {
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  transition: transform .25s ease;
+  margin-left: 0.5rem;
+}
 
 
 .flecha {
@@ -475,13 +583,28 @@ img[data-image-key] {
 .respuesta {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.5s ease, padding 0.3s ease;
-  padding: 0 10px;
+  transition: max-height 0.45s ease, padding 0.25s ease;
+  padding: 0 clamp(0.4rem, 2vw, 0.8rem);
+  margin-top: 0.25rem;
 }
 
 .respuesta.abierta {
   max-height: 500px; /* suficiente para mostrar el contenido */
-  padding: 10px 10px;
+  padding: 0.5rem clamp(0.4rem, 2vw, 0.8rem);
+}
+
+.respuesta p {
+  margin: 0;
+  font-size: clamp(0.85rem, 1.9vw, 0.95rem);
+  color: #333;
+  line-height: 1.4;
+}
+
+/* Botones pequeños en las respuestas */
+.button-ayuda {
+  font-size: clamp(0.78rem, 1.6vw, 0.9rem);
+  padding: 0.28rem 0.5rem;
+  vertical-align: middle;
 }
 
 
@@ -608,3 +731,115 @@ img[data-image-key] {
         #modal-confirmacion-pago button {
             margin-top: 10px;
         }
+
+
+/* Estilo del submenú de categorías */
+.submenu-categorias {
+    background: #fff;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* filtros como carrusel horizontal */
+.filtros {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.filtros::-webkit-scrollbar {
+    display: none;
+}
+
+.filtro {
+    flex: 0 0 auto; /* evita que se achiquen */
+    border: 1px solid #ddd;
+    background: #f8f8f8;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.filtro.active {
+    background: #ff6b6b;
+    color: #fff;
+    border-color: #ff6b6b;
+}
+
+/* Contenedor principal del detalle */
+.detalle-producto {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0 auto;
+}
+
+.detalle-producto-imagen {
+    flex: 1 1 300px;       /* Ocupa mínimo 300px, se adapta */
+    max-width: 400px;      /* Nunca más grande que 400px */
+}
+
+.detalle-producto-imagen img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;   /* Mantiene proporción */
+    border-radius: 8px;
+}
+
+/* Info del producto */
+.detalle-producto-info {
+    flex: 1 1 300px;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4px, 1.5vw, 10px);
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+}
+
+.detalle-producto-info h2 {
+    font-size: clamp(1.4rem, 2.5vw, 2rem); /* mínimo 1.4rem, máximo 2rem */
+    margin: 0;
+}
+
+.detalle-producto-info .descripcion-producto {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+}
+
+.detalle-producto-info p {
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+}
+
+.detalle-producto-info button.agregar-carrito {
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    padding: clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 18px);
+}
+
+
+/* Responsive móvil */
+@media (max-width: 768px) {
+    .detalle-producto {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px; /* espacio reducido entre texto y botón */
+    }
+
+    .detalle-producto-imagen {
+        max-width: 100%;     /* Se adapta al ancho del contenedor */
+    }
+
+    .detalle-producto-info {
+        max-width: 100%;
+    }
+
+    .detalle-producto-info .agregar-carrito {
+        width: 100%;
+    }
+}

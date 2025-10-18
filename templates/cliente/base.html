@@ -27,17 +27,26 @@
     <body>        
 <header class="custom-header">
     <h1>{% block Subtitulo %}  {% endblock  %}</h1>
-    <nav class="navbar navbar-expand navbar-dark">
-        <div class="nav navbar-nav mx-auto">
-            <a class="nav-item nav-link active" href="{% url 'cliente:index' table %}">Inicio</a>
-            <a class="nav-item nav-link active" href="{% url 'cliente:menu' table %}">Menu</a>
-            <a class="nav-item nav-link active" href="{% url 'cliente:ayuda' table %}">Ayuda</a>
-            <a class="nav-item nav-link active" href="{% url 'cliente:contacto' table %}">Contacto</a>
-            <a class="nav-item nav-link active" href="{% url 'cliente:carrito' table %}">
-                Carrito <img src="{% static 'cliente/imagen/carrito.jpg' %}" alt="Carrito" style="width:24px;height:24px;">(<span id="cantidad-items-carrito">0</span>)
-            </a>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#"></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav mx-auto">
+                <a class="nav-item nav-link" href="{% url 'cliente:index' table %}">Inicio</a>
+                <a class="nav-item nav-link" href="{% url 'cliente:menu' table %}">Menu</a>
+                <a class="nav-item nav-link" href="{% url 'cliente:ayuda' table %}">Ayuda</a>
+                <a class="nav-item nav-link" href="{% url 'cliente:contacto' table %}">Contacto</a>
+                <a class="nav-item nav-link" href="{% url 'cliente:carrito' table %}">
+                    Carrito <img src="{% static 'cliente/imagen/carrito.jpg' %}" alt="Carrito" style="width:24px;height:24px;">(<span id="cantidad-items-carrito">0</span>)
+                </a>
+            </div>
         </div>
-    </nav>
+    </div>
+</nav>
+
 </header>
         
         <main>

@@ -356,5 +356,107 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-});
+    const botones = document.querySelectorAll(".filtro");
+    const secciones = document.querySelectorAll(".categoria");
 
+    botones.forEach(boton => {
+        boton.addEventListener("click", function() {
+            const cat = this.getAttribute("data-cat");
+
+             // Quita la clase active de todos los botones
+             botones.forEach(b => b.classList.remove("active"));
+             // Activa solo el botón seleccionado
+             this.classList.add("active");
+
+            // manejar estilo activo multiple seleccion
+            /*
+            if (cat === "all") {
+                botones.forEach(b => b.classList.remove("active"));
+                this.classList.add("active");
+            } else {
+                document.querySelector(".filtro[data-cat='all']").classList.remove("active");
+                this.classList.toggle("active");
+            }
+
+            // categorías seleccionadas
+            const seleccionadas = Array.from(botones)
+                .filter(b => b.classList.contains("active") && b.getAttribute("data-cat") !== "all")
+                .map(b => b.getAttribute("data-cat"));
+            */
+
+            /*if (seleccionadas.length === 0 || cat === "all") */
+            if (cat === "all") {
+                // mostrar todas las categorias
+                secciones.forEach(sec => sec.style.display = "block");
+                //document.querySelector(".filtro[data-cat='all']").classList.add("active");
+            } else {
+                // mostrar solo las categorias seleccionadas
+                secciones.forEach(sec => {
+                    sec.style.display = (sec.id === cat) ? "block" : "none";
+                    //sec.style.display = seleccionadas.includes(sec.id) ? "block" : "none";
+                });
+            }
+        });
+    });
+
+document.querySelectorAll('.plato-item').forEach(plato => {
+    const desc = plato.querySelector('.descripcion');
+    const verMas = plato.querySelector('.ver-mas');
+
+    if (!desc || !verMas) return;
+
+    const lineHeight = parseFloat(getComputedStyle(desc).lineHeight);
+    const maxLines = 3;
+    const maxHeight = lineHeight * maxLines;
+
+    // Mostrar/ver-más solo si realmente se corta
+    if (desc.scrollHeight > maxHeight + 1) { // +1 para evitar errores de redondeo
+        verMas.style.display = 'inline';
+        verMas.textContent = 'Ver más';
+        verMas.addEventListener('click', () => {
+            const isExpanded = desc.classList.toggle('expandida');
+            verMas.textContent = isExpanded ? 'Ver menos' : 'Ver más';
+        });
+    } else {
+        verMas.style.display = 'none';
+    }
+});
+const formContacto = document.getElementById('form-contacto');
+
+if (formContacto) {
+    formContacto.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Creamos un FormData del form
+        const formData = new FormData(formContacto);
+
+        // Obtenemos el CSRF token del input oculto que Django genera
+        const csrfToken = formData.get('csrfmiddlewaretoken');
+
+        try {
+            const resp = await fetch(formContacto.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData  // enviamos como FormData, no JSON
+            });
+
+            if (!resp.ok) throw new Error('Error en la petición');
+
+            const result = await resp.json();
+
+            if (result.success) {
+                alert('✅ ¡Mensaje enviado con éxito!');
+                formContacto.reset();
+            } else {
+                alert('❌ Error al enviar el mensaje.');
+            }
+
+        } catch (err) {
+            alert('⚠️ Error de red: ' + err.message);
+        }
+    });
+}
+
+});

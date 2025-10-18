@@ -8,9 +8,19 @@ Shatalito - Menu
 {% block Subtitulo %}Nuestro Menu{% endblock %}
 
 {% block contenido %}
-<main class="menu-principal">
+<nav class="submenu-categorias">
+    <div class="filtros">
+        <button class="filtro active" data-cat="all">Todos</button>
+        {% for categoria, productos in categorias_con_productos %}
+            <button class="filtro" data-cat="cat-{{ categoria.id }}">{{ categoria.name }}</button>
+        {% endfor %}
+    </div>
+</nav>
+
+
+<main class="menu-principal main-container">
     {% for categoria, productos in categorias_con_productos %}
-    <section class="categoria">
+    <section class="categoria" id="cat-{{ categoria.id }}">
         <h2>{{ categoria.name }}</h2>
         <ul class="lista-platos">
             {% for producto in productos %}
@@ -20,9 +30,10 @@ Shatalito - Menu
                         <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
                     </a>
                 {% endif %}
-                <div>
+                <div class="producto-info">
                     <h3>{{ producto.name }}</h3>
                     <p class="descripcion">{{ producto.description }}</p>
+                    <span class="ver-mas">Ver más</span>
                     <p class="precio">${{ producto.price }}</p>
                     <button class="agregar-carrito"
                         data-id="{{ producto.id }}"

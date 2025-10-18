@@ -15,6 +15,5 @@ urlpatterns = [
     path('<int:table>/carrito/', views.carrito, name='carrito'),
     path('<int:table>/pedido_pagado/', views.pedido_pagado, name='pedido_pagado'),
     path('<int:table>/producto/<int:id>/', views.detalle_producto, name='detalle_producto'),  # Detalle de producto
-
-
+    path('<int:table>/contacto/enviar/', views.enviar_contacto, name='enviar_contacto')
 ]

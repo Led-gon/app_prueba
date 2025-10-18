@@ -9,13 +9,16 @@ Shatalito - Detalle Producto
 
 {% block contenido %}
 
-    <main>
-        <section>
+<main class="container">
+    <section class="detalle-producto">
+        <div class="detalle-producto-imagen">
             {% if producto.image %}
-                <img src="{{ producto.image.url }}" alt="{{ producto.name }}" style="max-width:400px;">
+                <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
             {% endif %}
+        </div>
+        <div class="detalle-producto-info">
             <h2>{{ producto.name }}</h2>
-            <p>{{ producto.description }}</p>
+            <p class="descripcion-producto">{{ producto.description }}</p>
             <p><strong>Precio:</strong> ${{ producto.price }}</p>
             <button class="agregar-carrito"
                 data-id="{{ producto.id }}"
@@ -24,10 +27,12 @@ Shatalito - Detalle Producto
                 Agregar al Carrito
             </button>
             <div class="control-cantidad" data-id="{{ producto.id }}" style="display: none;">
-                        <button class="menos">-</button>
-                        <span class="cantidad">1</span>
-                        <button class="mas">+</button>
+                <button class="menos">-</button>
+                <span class="cantidad">1</span>
+                <button class="mas">+</button>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
+</main>
+
 {% endblock %}

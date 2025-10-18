@@ -9,22 +9,42 @@ Shatalito - Menu
 
 {% block contenido %}
     <main>
-        <section class="hero">
-            <h2>Bienvenido a Nuestro Restaurante</h2>
-            <p>Descubre nuestros deliciosos platos y realiza tu pedido en línea.</p>
-            <a href="{% url 'cliente:menu' table %}" class="button">Ver el Menú</a>
+      <div class="main-container">
+        <section class="hero text-center p-4">
+             <h2>Bienvenido a Nuestro Restaurante</h2>
+             <p class="lead">Descubre nuestros deliciosos platos y realiza tu pedido en línea.</p>
+             <a href="{% url 'cliente:menu' table %}" class="btn btn-primary btn-lg">Ver el Menú</a>
         </section>
-        <section class="carrousel-destacados">
-            <h3>Nuestros Platos Estrella</h3>
-                <div class="carousel-container">
-                    <div class="carousel-slide">
-                        {% for producto in destacados %}
-                            <a href="{% url 'cliente:detalle_producto' table producto.id %}">
-                                <img src="{{ producto.image.url }}" alt="{{ producto.name }}">
-                            </a>
-                        {% endfor %}
-                    </div>
-                </div>
-        </section>
+        <section class="carrousel-destacados container my-4">
+  <h3 class="text-center mb-3">Nuestros Platos Estrella</h3>
+  
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000" data-bs-pause="hover">
+    <div class="carousel-inner">
+      {% for producto in destacados %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <a href="{% url 'cliente:detalle_producto' table producto.id %}">
+        <img src="{{ producto.image.url }}" 
+             class="d-block w-100 img-fluid" 
+             alt="{{ producto.name }}">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>{{ producto.name }}</h5>
+        </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Controles -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Siguiente</span>
+    </button>
+  </div>
+</section>
+    </div>
     </main>
 {% endblock %}

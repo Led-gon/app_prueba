@@ -103,3 +103,12 @@ LOGIN_URL = 'caja:login'
 LOGOUT_REDIRECT_URL = 'caja:login'
 LOGIN_REDIRECT_URL = 'caja:determine_dashboard'  # Redirige al dashboard después de iniciar sesión
 
+# Configuración de correo
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'alda.rojas.99@gmail.com'  # info@shatalito.com.ar
+EMAIL_HOST_PASSWORD = 'mpahkshivxvbhrdp'  # App Password de shatalito
+DEFAULT_FROM_EMAIL = 'Shatalito <info@shatalito.com.ar'
+EMAIL_TO = 'alda.rojas.99@gmail.com' #contacto@shatalito.com.ar contacto global
