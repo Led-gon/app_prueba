@@ -119,7 +119,7 @@ class Order(models.Model):
     endTime = models.DateTimeField(auto_now=True)  # Timestamp when the order was last updated
     order_date = models.DateField(default=timezone.now) # Use timezone.now for default
     customer_name = models.CharField(max_length=100, blank=True, null=True)
-    tableNumber = models.DecimalField(max_digits=5, decimal_places=0, blank=False, null=False) 
+    tableNumber = models.DecimalField(max_digits=5, decimal_places=0, blank=False, null=False)
 
     def __str__(self):
         return f"Order {self.id} - {self.status.name} - {self.order_date}"
@@ -157,7 +157,7 @@ class Payment(models.Model):
     idPaymentStatus = models.ForeignKey(PaymentStatus, on_delete=models.CASCADE, related_name='payments')
     payment_date = models.DateTimeField(auto_now_add=True)
     motive = models.TextField(max_length=220, blank=True, null=True)  # Optional field for payment motive
-    token = models.CharField(max_length=255, blank=False, null=False, default="aaaaxx3322-55sdf4")  # Optional field for payment token
+    token = models.CharField(max_length=255, blank=False, null=False)  # Optional field for payment token
 
     def __str__(self):
         return f"Payment {self.id} for Order {self.idOrder.id} - {self.idPaymentMethod.name} - {self.amount}"

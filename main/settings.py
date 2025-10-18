@@ -17,9 +17,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-=!#tu_clave_secreta_aqui#@!' # ¡CAMBIA ESTO EN PRODUCCIÓN!
 
-DEBUG = True # Déjalo True por ahora para desarrollo
+# Mercado Pago Configuration
+MERCADO_PAGO_PUBLIC_KEY = 'APP_USR-f1dc1fb8-a3ff-423f-9585-2275300142a7'
+MERCADO_PAGO_ACCESS_TOKEN = 'APP_USR-8220324942115231-101317-339235150338bfe78b4092e8182008d9-2923809631'
+MERCADOPAGO_WEBHOOK_URL = 'https://kgvisual.pythonanywhere.com/caja/api/payments/webhook/'
 
-ALLOWED_HOSTS = []
+
+DEBUG = False # Déjalo True por ahora para desarrollo
+
+ALLOWED_HOSTS = [ 
+    "EzeSpk.pythonanywhere.com",
+    "localhost",
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -32,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework', # Django REST Framework para APIs
     'cliente', # App para manejar clientes
     'cocina', # App para manejar cocina
+    'mercadopago', # SDK de Mercado Pago
 ]
 
 MIDDLEWARE = [

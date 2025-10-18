@@ -302,20 +302,21 @@ document.addEventListener('DOMContentLoaded', () => {
             // Recopilar datos del formulario
             const nombre = document.getElementById('nombre').value;
             const email = document.getElementById('email').value;
-            const dni = document.getElementById('dni').value;
+            const dni = document.getElementById('dni') ? document.getElementById('dni').value : '';
             const table = obtenerNumeroMesaDesdeURL();
             const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
             if (carrito.length === 0) {
                 alert('El carrito está vacío.');
                 return;
             }
-
+        
             // Obtener IP pública
             fetch('https://api.ipify.org?format=json')
             .then(res => res.json())
             .then(ipData => {
                 const ip = ipData.ip || '';
-
+            
+                // 1. Guardar la orden en el backend
                 fetch('/caja/api/guardar_pedido_cliente/', {
                     method: 'POST',
                     headers: {
@@ -325,17 +326,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         carrito: carrito,
                         nombre: nombre,
                         email: email,
-                        dni: dni,
                         ip: ip,
                         table: table
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) {
+                    if (data.success && data.order_id) {
                         localStorage.removeItem('carrito');
                         localStorage.setItem('ultimo_pedido_id', data.order_id);
-                        window.location.href = `/${table}/pedido_pagado/`;
+                    
+                        // 2. Crear preferencia de pago en el backend
+                        fetch('/caja/api/payments/create/', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                order_id: data.order_id,
+                                return_url: window.location.origin + `/${table}/pedido_pagado/`
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(payData => {
+                            if (payData.success && payData.init_point) {
+                                window.location.href = payData.init_point;
+                            } else {
+                                alert('Error al crear el pago: ' + (payData.error || ''));
+                                window.location.href = `/${table}/pedido_pagado/`;
+                            }
+                        })
+                        .catch(err => {
+                            alert('Error de red al crear el pago: ' + err);
+                            window.location.href = `/${table}/pedido_pagado/`;
+                        });
                     } else {
                         alert('Error al guardar el pedido: ' + (data.error || ''));
                     }
@@ -459,4 +481,53 @@ if (formContacto) {
     });
 }
 
+
+
+async function procesarPago(order_id) {
+    try {
+        // Crear preferencia de pago en el backend
+        const response = await fetch('/caja/api/payments/create/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                order_id: order_id,
+                return_url: window.location.origin + `/${obtenerNumeroMesaDesdeURL()}/pedido_pagado/`
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Redirigir al usuario a la página de pago de Mercado Pago
+            window.location.href = data.payment_url;
+        } else {
+            alert('Error al procesar el pago: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al conectar con el servidor');
+    }
+}
+
+        // Configure sua chave pública do Mercado Pago
+        const publicKey = settings.MERCADO_PAGO_PUBLIC_KEY;
+        // Configure o ID de preferência que você deve receber do seu backend
+        const preferenceId = "YOUR_PREFERENCE_ID";
+
+        // Inicializa o SDK do Mercado Pago
+        const mp = new MercadoPago(publicKey);
+
+        // Cria o botão de pagamento
+        const bricksBuilder = mp.bricks();
+        const renderWalletBrick = async (bricksBuilder) => {
+            await bricksBuilder.create("wallet", "walletBrick_container", {
+            initialization: {
+                preferenceId: "<PREFERENCE_ID>",
+            }
+        });
+        };
+
+        renderWalletBrick(bricksBuilder);
+
 });
+

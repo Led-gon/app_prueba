@@ -36,6 +36,11 @@ urlpatterns = [
 
     # Nueva ruta para guardar pedido de cliente
     path('api/guardar_pedido_cliente/', views.api_guardar_pedido_cliente, name='api_guardar_pedido_cliente'),
+
+    # Rutas para integración con Mercado Pago
+    path('api/payments/create/', views.create_payment, name='api_create_payment'),
+    path('api/payments/process_result/', views.process_payment_result, name='api_process_payment_result'),
+    path('api/payments/webhook/', views.mercadopago_webhook, name='mercadopago_webhook'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

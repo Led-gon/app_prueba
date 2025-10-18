@@ -18,4 +18,57 @@ Shatalito - Pedido Pagado
         </section>
     </main>
 
+    <div class="container mt-5">
+        <div id="payment-result">
+            <p>Procesando resultado del pago...</p>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtener parámetros de URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const status = urlParams.get('status');
+        const payment_id = urlParams.get('payment_id');
+        const external_reference = urlParams.get('external_reference');
+        
+        // Notificar al backend
+        if (status) {
+            fetch('/caja/api/payments/process_result/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    payment_id: payment_id || 'unknown',
+                    status: status,
+                    order_id: external_reference || localStorage.getItem('last_order_id')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mostrar mensaje según el estado
+                    let message = '';
+                    if (status === 'success') {
+                        message = '<h2>¡Pago completado!</h2><p>Tu pedido está siendo preparado.</p>';
+                        // Limpiar carrito
+                        localStorage.removeItem('carrito');
+                    } else if (status === 'pending') {
+                        message = '<h2>Pago pendiente</h2><p>Tu pedido será procesado una vez confirmado el pago.</p>';
+                    } else {
+                        message = '<h2>Pago rechazado</h2><p>Por favor, intenta nuevamente con otro método de pago.</p>';
+                    }
+                    document.getElementById('payment-result').innerHTML = message;
+                } else {
+                    document.getElementById('payment-result').innerHTML = 
+                        '<h2>Error</h2><p>Hubo un problema procesando tu pago. Por favor, contacta a soporte.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('payment-result').innerHTML = 
+                    '<h2>Error de conexión</h2><p>No pudimos verificar el estado de tu pago.</p>';
+            });
+        }
+    });
+    </script>
 {% endblock %}

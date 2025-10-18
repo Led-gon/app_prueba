@@ -4,12 +4,15 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods
 from django.utils.dateparse import parse_date
 from django.utils import timezone
 from django.db import IntegrityError
 import json
 import re
 from decimal import Decimal
+from .services import PaymentService
+import json
 
 from .models import CustomUser, Product, Order, OrderItem, State
 
@@ -459,4 +462,47 @@ def api_guardar_pedido_cliente(request):
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+######################################################
+#               Procesamiento de pagos
+#
+######################################################
 
+@require_http_methods(["POST"])
+@csrf_exempt
+def create_payment(request):
+    """Endpoint para crear un pago desde el frontend"""
+    data = json.loads(request.body)
+    order_id = data.get('order_id')
+    return_url = data.get('return_url')
+    print("Received create_payment request with data:", data)  # Debug log
+    print("Order ID:", order_id, "Return URL:", return_url)  # Debug log
+    
+    if not order_id or not return_url:
+        return JsonResponse({"success": False, "error": "Missing required parameters"}, status=400)
+    
+    result = PaymentService.create_payment_preference(order_id, return_url)
+    return JsonResponse(result)
+
+@require_http_methods(["POST"])
+@csrf_exempt
+def process_payment_result(request):
+    """Endpoint para procesar el resultado del pago"""
+    data = json.loads(request.body)
+    payment_id = data.get('payment_id')
+    status = data.get('status')
+    order_id = data.get('order_id')
+    
+    result = PaymentService.process_payment_result(payment_id, status, order_id)
+    return JsonResponse(result)
+
+@csrf_exempt
+def mercadopago_webhook(request):
+    """Webhook para recibir notificaciones de Mercado Pago"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            # Procesar webhook...
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)}, status=500)
+    return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
