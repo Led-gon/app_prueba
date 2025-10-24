@@ -10,26 +10,33 @@
         "model": "caja.State",
         "pk": 2,
         "fields": {
-            "name": "En Preparación"
+            "name": "En espera"
         }
     },
     {
         "model": "caja.State",
         "pk": 3,
         "fields": {
-            "name": "Listo para Entregar"
+            "name": "En Preparación"
         }
     },
     {
         "model": "caja.State",
         "pk": 4,
         "fields": {
-            "name": "Entregado"
+            "name": "Listo para Entregar"
         }
     },
     {
         "model": "caja.State",
         "pk": 5,
+        "fields": {
+            "name": "Entregado"
+        }
+    },
+    {
+        "model": "caja.State",
+        "pk": 6,
         "fields": {
             "name": "Cancelado"
         }

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -11,6 +12,7 @@ from django.db import IntegrityError
 import json
 import re
 from decimal import Decimal
+
 from .services import PaymentService
 import json
 
@@ -497,12 +499,55 @@ def process_payment_result(request):
 
 @csrf_exempt
 def mercadopago_webhook(request):
-    """Webhook para recibir notificaciones de Mercado Pago"""
     if request.method == 'POST':
+        notification = request.POST or json.loads(request.body)
+        topic = notification.get('topic') or notification.get('type')
+        payment_id = notification.get('data.id') or notification.get('id') or notification.get('payment_id')
+    elif request.method == 'GET':
+        topic = request.GET.get('topic')
+        payment_id = request.GET.get('id')
+    else:
+        return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
+
+    if topic == 'payment' and payment_id:
+        import mercadopago
+        sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
+        payment_info = sdk.payment().get(payment_id)
+        payment_data = payment_info.get("response", {})
+        mp_status = payment_data.get("status", "pending")
+        external_reference = payment_data.get("external_reference")
+
+        # Actualiza el estado de la orden y el pago
+        from caja.models import Order, Payment, PaymentMethod, PaymentStatus
         try:
-            data = json.loads(request.body)
-            # Procesar webhook...
-            return JsonResponse({"success": True})
+            order = Order.objects.get(id=external_reference)
+            status_mapping = {
+                "approved": "Aprobado",
+                "in_process": "Pendiente",
+                "rejected": "Rechazado",
+                "cancelled": "Cancelado"
+            }
+            mapped_status = status_mapping.get(mp_status, "Pendiente")
+            payment_method = PaymentMethod.objects.get(name='Mercado Pago')
+            payment_status = PaymentStatus.objects.get(name=mapped_status)
+            Payment.objects.create(
+                idOrder=order,
+                idPaymentMethod=payment_method,
+                amount=order.amount,
+                idPaymentStatus=payment_status,
+                token=str(payment_id)
+            )
+            # Actualiza el estado de la orden
+            if mp_status == "approved":
+                order.status_id = 2  # En Preparación
+            elif mp_status == "in_process":
+                order.status_id = 1  # Pendiente
+            elif mp_status in ["rejected", "cancelled"]:
+                order.status_id = 5  # Cancelado
+            order.save()
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)}, status=500)
-    return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Datos insuficientes"}, status=400)

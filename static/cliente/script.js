@@ -481,53 +481,55 @@ if (formContacto) {
     });
 }
 
+const paymentResult = document.getElementById('payment-result');
+if (paymentResult) {
+    // Obtener parámetros de URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+    const payment_id = urlParams.get('payment_id');
+    const external_reference = urlParams.get('external_reference');
 
-
-async function procesarPago(order_id) {
-    try {
-        // Crear preferencia de pago en el backend
-        const response = await fetch('/caja/api/payments/create/', {
+    // Notificar al backend
+    if (status) {
+        fetch('/caja/api/payments/process_result/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                order_id: order_id,
-                return_url: window.location.origin + `/${obtenerNumeroMesaDesdeURL()}/pedido_pagado/`
+                payment_id: payment_id || 'unknown',
+                status: status,
+                order_id: external_reference || localStorage.getItem('ultimo_pedido_id')
             })
+        })
+        .then(response => response.json())
+        .then(data => {
+            let message = '';
+            if (data.success) {
+                if (data.status === 'approved') {
+                    message = `<h2>¡Pago completado!</h2>
+                        <p>Tu pedido está siendo preparado.</p>
+                        <p>Número de Pedido: <strong>${data.order_id || external_reference}</strong></p>`;
+                    localStorage.removeItem('carrito');
+                } else if (data.status === 'in_process') {
+                    message = `<h2>Pago pendiente</h2>
+                        <p>Tu pedido será procesado una vez confirmado el pago.</p>
+                        <p>Número de Pedido: <strong>${data.order_id || external_reference}</strong></p>
+                        <p>Recibirás un correo electrónico con los detalles de tu pedido.</p>`;
+                } else {
+                    message = `<h2>Pago rechazado</h2>
+                        <p>Por favor, intenta nuevamente con otro método de pago.</p>
+                    <p>Número de Pedido: <strong>${data.order_id || external_reference}</strong></p>`;
+                }
+            } else {
+                message = `<h2>Error</h2>
+                    <p>Hubo un problema procesando tu pago. Por favor, contacta a soporte.</p>`;
+            }
+            paymentResult.innerHTML = message;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            paymentResult.innerHTML = `<h2>Error de conexión</h2>
+                <p>No pudimos verificar el estado de tu pago.</p>`;
         });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Redirigir al usuario a la página de pago de Mercado Pago
-            window.location.href = data.payment_url;
-        } else {
-            alert('Error al procesar el pago: ' + data.error);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al conectar con el servidor');
     }
 }
-
-        // Configure sua chave pública do Mercado Pago
-        const publicKey = settings.MERCADO_PAGO_PUBLIC_KEY;
-        // Configure o ID de preferência que você deve receber do seu backend
-        const preferenceId = "YOUR_PREFERENCE_ID";
-
-        // Inicializa o SDK do Mercado Pago
-        const mp = new MercadoPago(publicKey);
-
-        // Cria o botão de pagamento
-        const bricksBuilder = mp.bricks();
-        const renderWalletBrick = async (bricksBuilder) => {
-            await bricksBuilder.create("wallet", "walletBrick_container", {
-            initialization: {
-                preferenceId: "<PREFERENCE_ID>",
-            }
-        });
-        };
-
-        renderWalletBrick(bricksBuilder);
-
 });
-

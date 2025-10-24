@@ -4,8 +4,8 @@ from django.contrib import messages
 from django.http import HttpResponseForbidden
 from caja.models import Order, State
 
-PREPARACION_STATE_ID = 2  # "En Preparación"
-LISTO_STATE_ID = 3  # "Listo para Entregar"
+PREPARACION_STATE_ID = 3  # "En Preparación"
+LISTO_STATE_ID = 4  # "Listo para Entregar"
 
 from django.contrib.auth.models import Group
 import logging

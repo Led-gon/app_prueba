@@ -46,8 +46,22 @@ Shatalito - Revisar Pedido y Pagar
       </div>
     </div>
 
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <div id="walletBrick_container"></div>
 
+    <script>
+        const mp = new MercadoPago("YOUR_PUBLIC_KEY", {
+            locale: "es-AR"
+        });
 
+        mp.checkout({
+            preference: {
+                id: "YOUR_PREFERENCE_ID"
+            },
+            render: {
+                container: "#walletBrick_container",
+                label: "Pagar con Mercado Pago"
+            }
+        });
+    </script>
 
 {% endblock %}

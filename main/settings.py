@@ -26,8 +26,8 @@ MERCADOPAGO_WEBHOOK_URL = 'https://kgvisual.pythonanywhere.com/caja/api/payments
 DEBUG = False # Déjalo True por ahora para desarrollo
 
 ALLOWED_HOSTS = [ 
-    "EzeSpk.pythonanywhere.com",
-    "localhost",
+    'kgvisual.pythonanywhere.com',
+    'localhost',
 ]
 
 INSTALLED_APPS = [
@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'caja', # App principal para manejar la caja
-    'rest_framework', # Django REST Framework para APIs
     'cliente', # App para manejar clientes
     'cocina', # App para manejar cocina
     'mercadopago', # SDK de Mercado Pago
