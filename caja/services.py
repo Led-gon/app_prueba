@@ -100,7 +100,7 @@ class PaymentService:
             )
             # Actualiza el estado de la orden usando el modelo State
             if mp_status == "approved":
-                preparado_state = State.objects.get(name="En Preparación")
+                preparado_state = State.objects.get(name="En espera")
                 order.status = preparado_state
             elif mp_status == "in_process":
                 pendiente_state = State.objects.get(name="Pendiente")

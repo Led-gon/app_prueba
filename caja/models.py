@@ -119,7 +119,9 @@ class Order(models.Model):
     endTime = models.DateTimeField(auto_now=True)  # Timestamp when the order was last updated
     order_date = models.DateField(default=timezone.now) # Use timezone.now for default
     customer_name = models.CharField(max_length=100, blank=True, null=True)
+    customer_email = models.EmailField(max_length=100, blank=True, null=True)
     tableNumber = models.DecimalField(max_digits=5, decimal_places=0, blank=False, null=False)
+
 
     def __str__(self):
         return f"Order {self.id} - {self.status.name} - {self.order_date}"

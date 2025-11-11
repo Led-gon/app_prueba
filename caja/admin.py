@@ -66,14 +66,14 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'customer_name', 'order_date', 'status', 'amount')
+    list_display = ('id', 'customer_name', 'customer_email', 'order_date', 'status', 'amount')
     list_filter = ('status', 'order_date')
     search_fields = ('customer_name', 'id')
     inlines = [OrderItemInline]
     readonly_fields = ('amount', 'endTime') # El total se calcula
     fieldsets = (
         (None, {
-            'fields': ('customer_name', 'tableNumber', 'status', 'amount', 'IP', 'initialTime', 'endTime', 'order_date')
+            'fields': ('customer_name', 'customer_email', 'tableNumber', 'status', 'amount', 'IP', 'initialTime', 'endTime', 'order_date')
         }),
     )
 

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -6,12 +7,16 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods
 from django.utils.dateparse import parse_date
 from django.utils import timezone
 from django.db import IntegrityError
 import json
 import re
 from decimal import Decimal
+
+from .services import PaymentService
+import json
 
 from .services import PaymentService
 import json
@@ -154,6 +159,7 @@ def api_orders_list_create(request):
         orders_data = [{
             "id": order.id,
             "customer_name": order.customer_name,
+            "customer_email": order.customer_email,
             "date": order.order_date.strftime('%Y-%m-%d'),
             "status": order.status.name,  
             "total": float(order.amount),
@@ -174,15 +180,17 @@ def api_orders_list_create(request):
         try:
             data = json.loads(request.body)
             customer_name = data.get('customer_name', '').strip()
+            customer_email = data.get('customer_email', '').strip()
             table_number = data.get('table_number')
             if not table_number or not isinstance(table_number, (int, float)):
                 return JsonResponse({'error': 'Número de mesa es requerido y debe ser un número.'}, status=400)
 
-            order = Order.objects.create(customer_name=customer_name, tableNumber=table_number)
+            order = Order.objects.create(customer_name=customer_name, customer_email=customer_email, tableNumber=table_number)
             return JsonResponse({
                 'message': 'Pedido creado', 
                 'order_id': order.id, 
                 'customer_name': order.customer_name,
+                'customer_email': order.customer_email,
                 'table_number': order.tableNumber
             }, status=201)
         except json.JSONDecodeError:
@@ -199,7 +207,9 @@ def api_order_detail_update_delete(request, order_id):
 
     if request.method == 'GET': 
         order_data = {
-            "id": order.id, "customer_name": order.customer_name,
+            "id": order.id, 
+            "customer_name": order.customer_name,
+            "customer_email": order.customer_email,
             "date": order.order_date.strftime('%Y-%m-%d'), "status": order.status.name, 
             "total": float(order.amount),
             "items": [{"product_name": item.product.name, "quantity": item.quantity, "sugerency": item.sugerency, "price": float(item.price)} for item in order.order_items.all()]
@@ -420,7 +430,6 @@ def api_guardar_pedido_cliente(request):
             carrito = data.get('carrito', [])
             nombre = data.get('nombre')
             email = data.get('email')
-            dni = data.get('dni')
             sugerency = data.get('sugerency', '')
             ip = data.get('ip', '')
             table_number = data.get('table', 0)
@@ -431,6 +440,7 @@ def api_guardar_pedido_cliente(request):
             estado = State.objects.first()
             order = Order.objects.create(
                 customer_name=nombre,
+                customer_email=email,
                 amount=0,
                 status=estado,
                 IP=ip,
@@ -539,11 +549,11 @@ def mercadopago_webhook(request):
             )
             # Actualiza el estado de la orden
             if mp_status == "approved":
-                order.status_id = 2  # En Preparación
+                order.status_id = 2  # En Espera
             elif mp_status == "in_process":
                 order.status_id = 1  # Pendiente
             elif mp_status in ["rejected", "cancelled"]:
-                order.status_id = 5  # Cancelado
+                order.status_id = 6  # Cancelado
             order.save()
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)}, status=500)

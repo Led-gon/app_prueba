@@ -219,9 +219,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Lista de estados válidos (basado en tu models.py)
         const validStatuses = [
             {id: 1, name: "Pendiente"},
-            {id: 2, name: "En Preparación"},
-            {id: 3, name: "Listo para Entregar"},
-            {id: 4, name: "Entregado"}
+            {id: 2, name: "En espera"},
+            {id: 3, name: "En Preparación"},
+            {id: 4, name: "Listo para Entregar"},
+            {id: 5, name: "Entregado"}
         ];
 
         // Crear un modal simple usando prompt-like behavior con select (tu implementación original)
@@ -819,7 +820,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             //const date = new Date().toISOString().split('T')[0];
             //const url = `${API_URLS.orders_list_create}?date=&status=${READY_STATE_ID}`;
 
-            const READY_STATE_ID = 3; // El id de "Listo para Entregar"
+            const READY_STATE_ID = 4; // El id de "Listo para Entregar"
             const url = `${API_URLS.orders_list_create}?status=${READY_STATE_ID}`; // <-- Sin date
             const response = await fetch(url);
             const orders = await response.json();
@@ -869,7 +870,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     const response = await fetch(url, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
-                        body: JSON.stringify({ status: 4 }) // 4 = Entregado
+                        body: JSON.stringify({ status: 5 }) // 5 = Entregado
                     });
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.error || 'Error al entregar pedido');
