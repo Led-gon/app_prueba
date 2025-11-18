@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const filterStatusSelect = document.getElementById('filterStatus');
     const applyFiltersButton = document.getElementById('applyFiltersButton');
     const listUsersButton = document.getElementById('listUsersButton');
+    const filterOrderIdInput = document.getElementById('filterOrderId');
 
     const listProductsButton = document.getElementById('listProductsButton');
     const productsTableBody = document.querySelector('#productsTable tbody');
@@ -159,8 +160,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         showMessage(ordersMessage, 'Cargando pedidos...');
         const date = filterDateInput.value;
         const status = filterStatusSelect.value;
+        const orderId = filterOrderIdInput.value.trim();
         let url = `${API_URLS.orders_list_create}?date=${date}`;
         if (status) url += `&status=${status}`;
+        if (orderId) url += `&order_id=${orderId}`;
         
         try {
             const response = await fetch(url);
@@ -287,22 +290,51 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // cancelOrder se encarga de cancelar un pedido (tu implementación original con confirm())
     async function cancelOrder(orderId) {
-        // Usa tu showConfirmationModal personalizado
-        const confirmed = await showConfirmationModal(`¿Seguro que desea cancelar el pedido #${orderId}? Esta acción es irreversible.`);
-        if (!confirmed) {
-            return; // El usuario canceló
-        }
+        // Crear el modal con textarea obligatorio
+        return new Promise(resolve => {
+            const modal = document.createElement('div');
+            modal.classList.add('custom-modal-overlay');
+            modal.innerHTML = `
+                <div class="custom-modal-content">
+                    <p>¿Seguro que desea cancelar el pedido #${orderId}? Esta acción es irreversible.</p>
+                    <label for="cancelReason">Motivo de la cancelación (obligatorio):</label>
+                    <textarea id="cancelReason" rows="3" style="width:100%;" required></textarea>
+                    <div class="modal-buttons">
+                        <button id="confirmOkBtn" class="modal-button primary">Cancelar Pedido</button>
+                        <button id="confirmCancelBtn" class="modal-button secondary">No cancelar</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
 
-        try {
-            const url = API_URLS.order_detail_update_delete.replace('12345', orderId); // Reemplazar placeholder
-            const response = await fetch(url , {
-                    method: 'DELETE',
-                    headers: { 'X-CSRFToken': getCookie('csrftoken') }
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Error al cancelar pedido');
-            showMessage(ordersMessage, data.message); fetchOrders();
-        } catch (e) { showMessage(ordersMessage, e.message, true); }
+            document.getElementById('confirmOkBtn').onclick = async () => {
+                const reason = document.getElementById('cancelReason').value.trim();
+                if (!reason) {
+                    alert('Debes ingresar el motivo de la cancelación.');
+                    return;
+                }
+                document.body.removeChild(modal);
+                try {
+                    const url = API_URLS.order_detail_update_delete.replace('12345', orderId);
+                    const response = await fetch(url, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                        body: JSON.stringify({ observations: reason })
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error || 'Error al cancelar pedido');
+                    showMessage(ordersMessage, data.message);
+                    fetchOrders();
+                } catch (e) {
+                    showMessage(ordersMessage, e.message, true);
+                }
+                resolve();
+            };
+            document.getElementById('confirmCancelBtn').onclick = () => {
+                document.body.removeChild(modal);
+                resolve();
+            };
+        });
     }
     
     // Función genérica para mostrar un modal de confirmación (tu implementación original)
@@ -926,4 +958,5 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.body.removeChild(modal);
         };
     }
+    
 });

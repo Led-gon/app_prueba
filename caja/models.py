@@ -121,6 +121,7 @@ class Order(models.Model):
     customer_name = models.CharField(max_length=100, blank=True, null=True)
     customer_email = models.EmailField(max_length=100, blank=True, null=True)
     tableNumber = models.DecimalField(max_digits=5, decimal_places=0, blank=False, null=False)
+    observations = models.TextField(max_length=500, blank=True, null=True)  # Optional field for order observations
 
 
     def __str__(self):

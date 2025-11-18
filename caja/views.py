@@ -143,9 +143,12 @@ def api_orders_list_create(request):
     if request.method == 'GET':
         status_filter = request.GET.get('status')
         date_filter_str = request.GET.get('date')
+        order_id_filter = request.GET.get('order_id')
         
         orders_qs = Order.objects.select_related('status').prefetch_related('order_items__product').order_by('-order_date', 'id', )
 
+        if order_id_filter:
+            orders_qs = orders_qs.filter(id=order_id_filter)
         if date_filter_str:
             parsed_date = parse_date(date_filter_str)
             if parsed_date: 
@@ -235,7 +238,10 @@ def api_order_detail_update_delete(request, order_id):
     elif request.method == 'DELETE': 
         try:
             cancelled_state = State.objects.get(name='Cancelado') 
+            data = json.loads(request.body.decode('utf-8')) if request.body else {}
+            observations = data.get('observations', '')
             order.status = cancelled_state
+            order.observations = observations
             order.save()
             return JsonResponse({'message': f'Pedido {order_id} cancelado', 'status': order.status.name})
         except State.DoesNotExist:

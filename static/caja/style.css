@@ -210,6 +210,12 @@ header {
     margin-bottom: 0; /* Reset margin for inline elements */
     padding: 8px;
 }
+#filterOrderId {
+    width: 80px !important;
+    min-width: 80px;
+    max-width: 120px;
+    padding-right: 0;
+}
 
 
 /* Estilos para secciones en dashboards */
