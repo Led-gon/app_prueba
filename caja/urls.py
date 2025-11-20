@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/admin/products/', views.api_products_list_create, name='api_products_list_create'),
     path('api/admin/products/by_name/', views.api_get_product_by_name, name='api_get_product_by_name'),
     path('api/admin/products/<int:product_id>/stock/', views.api_update_product_stock, name='api_update_product_stock'),
+    path('api/admin/products/<int:product_id>/', views.api_product_detail_update_delete, name='api_product_detail_update_delete'),
     
     # Users API (Superuser)
     path('api/session-status/', views.api_session_status, name='api_session_status'),

@@ -304,15 +304,67 @@ def api_products_list_create(request):
 
 @login_required(login_url='caja:login')
 @role_required(allowed_roles=['Administrador', 'Super Usuario'])
+def api_product_detail_update_delete(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+
+    if request.method == 'GET':
+        return JsonResponse({
+            "id": product.id,
+            "name": product.name,
+            "description": product.description,
+            "price": float(product.price),
+            "stock": product.stock,
+            "idCategory": product.idCategoria.id,
+            "image": product.image.url if product.image else None
+        })
+
+    elif request.method == 'POST':
+        # Actualizar producto
+        name = request.POST.get('name', '').strip() or product.name
+        description = request.POST.get('description', '').strip() or product.description
+        price_str = request.POST.get('price')
+        stock_str = request.POST.get('stock')
+        category_id = request.POST.get('category')
+        image_file = request.FILES.get('image')
+
+        try:
+            if price_str is not None:
+                product.price = Decimal(price_str)
+            if stock_str is not None:
+                product.stock = int(stock_str)
+            if category_id:
+                product.idCategoria_id = int(category_id)
+            product.name = name
+            product.description = description
+            if image_file:
+                product.image = image_file
+            product.save()
+            return JsonResponse({'message': 'Producto actualizado correctamente.'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    elif request.method == 'DELETE':
+        product.delete()
+        return JsonResponse({'message': 'Producto eliminado correctamente.'})
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+@login_required(login_url='caja:login')
+@role_required(allowed_roles=['Administrador', 'Super Usuario'])
 def api_get_product_by_name(request):
     name_query = request.GET.get('name')
     if not name_query:
         return JsonResponse({"error": "Parámetro 'name' requerido"}, status=400)
-    try:
-        product = Product.objects.get(name__iexact=name_query)
-        return JsonResponse({"id": product.id, "name": product.name, "price": float(product.price), "stock": product.stock})
-    except Product.DoesNotExist:
+    if not name_query:
+        return JsonResponse({"error": "Parámetro 'name' requerido"}, status=400)
+    products = Product.objects.filter(name__icontains=name_query)
+    if not products.exists():
         return JsonResponse({"error": "Producto no encontrado"}, status=404)
+    data = [
+        {"id": p.id, "name": p.name, "price": float(p.price), "stock": p.stock, "description": p.description, "idCategory": p.idCategoria.id}
+        for p in products
+    ]
+    return JsonResponse(data, safe=False)
 
 
 @login_required(login_url='caja:login')
