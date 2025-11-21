@@ -71,7 +71,7 @@
     <nav class="products-subnav">
       <button class="subnav-button active-subtab" data-target="productsListSection">Listado</button>
       <button class="subnav-button" data-target="productsAddSection">Añadir</button>
-      <button class="subnav-button" data-target="productsEditSection">Modificar</button>
+      <button class="subnav-button" data-target="productsStockSection">Stock</button>
     </nav>
     <div class="tabs__panels flow">
       <section id="productsListSection" class="product-content active-subtab">
@@ -101,32 +101,12 @@
         <button id="addProductButton">Guardar</button>
         <p id="addProductMessage" class="message"></p>
       </section>
-      <section id="productsEditSection" class="product-content">
-        <h3>Modificar Producto</h3>
-          <div style="position:relative; display:inline-block;">
-            <input id="searchProductNameEdit" type="text" placeholder="Buscar producto por nombre">
-            <div id="searchProductSuggestions" class="autocomplete-suggestions"></div>
-            <button id="searchProductEditButton">Buscar</button>
-          </div>
-          
-          <hr>
-          <label>Producto a Modificar:</label>          
-          <label> ID: <input id="editProductId" type="number" readonly></label>
-          <label> Nombre: <input id="editProductName" type="text" ></label>
-          <label> Descripcion: <textarea id="editProductDescription" rows="3"></textarea></label>
-          <label> Precio: <input id="editProductPrice" type="number" step="0.01" ></label>
-          <label> Stock: <input id="editProductStock" type="number" ></label>
-          <label> Categoría: <select id="editProductCategory">
-            <option value=""></option>
-            <option value="1">Bebidas</option>
-            <option value="2">Minutas</option>
-            <option value="3">Entradas</option>
-            <option value="4">Platos principales</option>
-            <option value="5">Postres</option>
-          </select></label>
-          <label> Imagen: <input id="editProductImage" type="file" accept="image/*"></label>
-          <button id="updateProductButton">Actualizar</button>
-          <p id="editProductMessage" class="message"></p>
+      <section id="productsStockSection" class="product-content">
+        <h3>Modificar Stock</h3>
+        <input id="searchProductNameStock" type="text" placeholder="Nombre producto">
+        <button id="searchProductStockButton">Buscar</button>
+        <div id="productStockDetails"></div>
+        <p id="modifyProductStockMessage" class="message"></p>
       </section>
     </div>
   </section>

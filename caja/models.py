@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db import transaction
 from django.utils import timezone
 import os
 from django.conf import settings
@@ -44,7 +45,7 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     idCategoria = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products', blank=True, null=True)
     idPromotion = models.ForeignKey('Promotion', on_delete=models.CASCADE, related_name='products', blank=True, null=True)
-    active = models.BooleanField(default=True)  # To mark if the product is active or not
+    active = models.BooleanField(default=True)  # To mark if the product is active
 
     def save(self, *args, **kwargs):
         if self.image:
@@ -122,6 +123,7 @@ class Order(models.Model):
     customer_email = models.EmailField(max_length=100, blank=True, null=True)
     tableNumber = models.DecimalField(max_digits=5, decimal_places=0, blank=False, null=False)
     observations = models.TextField(max_length=500, blank=True, null=True)  # Optional field for order observations
+    stock_reserved = models.BooleanField(default=False)  # nuevo campo
 
 
     def __str__(self):
@@ -135,8 +137,70 @@ class Order(models.Model):
         self.amount = total
         self.save(update_fields=['amount'])
 
+    def reserve_stock(self):
+        """
+        Descontar stock para todos los OrderItem asociados.
+        Idempotente: si stock_reserved True no hace nada.
+        Lanza ValueError si stock insuficiente o producto inactivo.
+        """
+        if self.stock_reserved:
+            return
+        with transaction.atomic():
+            # seleccionamos items con lock para evitar race conditions
+            items = self.items.select_related('product').select_for_update()
+            for item in items:
+                prod = item.product
+                if not getattr(prod, 'active', True):
+                    raise ValueError(f"Producto {prod.id} no disponible")
+                if prod.stock is not None and prod.stock < item.quantity:
+                    raise ValueError(f"Stock insuficiente para producto {prod.id}")
+                if prod.stock is not None:
+                    prod.stock -= item.quantity
+                    prod.save(update_fields=['stock'])
+            self.stock_reserved = True
+            self.save(update_fields=['stock_reserved'])
 
+    def release_stock(self):
+        """
+        Devolver al stock las cantidades reservadas por esta orden.
+        Idempotente: si stock_reserved False no hace nada.
+        """
+        if not self.stock_reserved:
+            return
+        with transaction.atomic():
+            items = self.items.select_related('product').select_for_update()
+            for item in items:
+                prod = item.product
+                if prod.stock is None:
+                    continue
+                prod.stock += item.quantity
+                prod.save(update_fields=['stock'])
+            self.stock_reserved = False
+            self.save(update_fields=['stock_reserved'])
 
+    def change_status(self, new_status_name):
+        """
+        Cambia estado y aplica reservas/devoluciones según reglas:
+        - al pasar a 'Pendiente' -> reservar stock
+        - al pasar a 'Cancelado' -> devolver stock si estaba reservado
+        Busca State por name (case-insensitive).
+        """
+        from .models import State  # import local para evitar ciclos
+        state_qs = State.objects.filter(name__iexact=new_status_name)
+        if not state_qs.exists():
+            raise ValueError(f"Estado '{new_status_name}' no existe")
+        new_state = state_qs.first()
+
+        with transaction.atomic():
+            # reservar stock al entrar en Pendiente
+            if new_state.name.lower() == 'pendiente' and not self.stock_reserved:
+                self.reserve_stock()
+            # devolver stock al cancelar
+            if new_state.name.lower() in ['cancelado', 'cancelada'] and self.stock_reserved:
+                self.release_stock()
+            self.status = new_state
+            self.save(update_fields=['status'])
+        return self
 
 class PaymentMethod(models.Model):
     id = models.AutoField(primary_key=True)  # Explicitly define primary key

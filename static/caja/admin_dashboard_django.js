@@ -460,155 +460,43 @@ document.addEventListener('DOMContentLoaded', async function() {
         } catch(e){ showMessage(addProductMessage, e.message, true); }
     });
 
-    // Modificar producto
-
-    const searchProductNameEditInput = document.getElementById('searchProductNameEdit');
-    const searchProductEditButton = document.getElementById('searchProductEditButton');
-        
-    const searchProductSuggestions = document.getElementById('searchProductSuggestions');
-    
-    searchProductNameEditInput.addEventListener('input', async function() {
-        const query = this.value.trim();
-        if (query.length < 2) {
-            searchProductSuggestions.innerHTML = '';
-            searchProductSuggestions.style.display = 'none';
-            return;
-        }
+    // Modificar stock de producto
+    if(searchProductStockButton) searchProductStockButton.addEventListener('click', async () => {
+        const name = searchProductNameStockInput.value.trim();
+        if(!name) { showMessage(modifyProductStockMessage, "Ingrese nombre de producto.", true); return; }
+        productStockDetailsDiv.innerHTML = 'Buscando...';
         try {
-            const response = await fetch(`${API_URLS.get_product_by_name}?name=${encodeURIComponent(query)}`);
-            const products = await response.json();
-            if (!response.ok || !Array.isArray(products) || products.length === 0) {
-                searchProductSuggestions.innerHTML = '';
-                searchProductSuggestions.style.display = 'none';
-                return;
-            }
-            // Renderizar sugerencias
-            searchProductSuggestions.innerHTML = products.map(p =>
-                `<div class="autocomplete-suggestion" data-id="${p.id}">${p.name}</div>`
-            ).join('');
-            searchProductSuggestions.style.display = 'block';
-        
-        } catch (e) {
-            searchProductSuggestions.innerHTML = '';
-            searchProductSuggestions.style.display = 'none';
-        }
-    });
-    
-    searchProductSuggestions.addEventListener('click', function(e) {
-        if (e.target.classList.contains('autocomplete-suggestion')) {
-            searchProductNameEditInput.value = e.target.textContent;
-            searchProductSuggestions.innerHTML = '';
-            searchProductSuggestions.style.display = 'none';
-        }
+            const response = await fetch(`${API_URLS.get_product_by_name}?name=${encodeURIComponent(name)}`);
+            const p = await response.json();
+            if(!response.ok) throw new Error(p.error || 'Producto no encontrado');
+            productStockDetailsDiv.innerHTML = `
+                <p><strong>ID:</strong> ${p.id}, <strong>Nombre:</strong> ${p.name}, <strong>Stock Actual:</strong> ${p.stock}</p>
+                <label for="newStockValue_${p.id}">Nuevo Stock:</label>
+                <input type="number" id="newStockValue_${p.id}" value="${p.stock}" min="0" style="width: 80px; margin-right: 10px;">
+                <button onclick="updateProductStock(${p.id})">Actualizar Stock</button>`; // Func global
+            showMessage(modifyProductStockMessage, "Producto encontrado.");
+        } catch(e){ showMessage(modifyProductStockMessage, e.message, true); productStockDetailsDiv.innerHTML = ''; }
     });
 
-    // Opcional: ocultar sugerencias si el input pierde foco
-    searchProductNameEditInput.addEventListener('blur', () => {
-        setTimeout(() => {
-            searchProductSuggestions.innerHTML = '';
-            searchProductSuggestions.style.display = 'none';
-        }, 200);
-    });
-
-    if (searchProductEditButton) {
-        searchProductEditButton.addEventListener('click', async () => {
-            const nameQuery = searchProductNameEditInput.value.trim();
-            if (!nameQuery) {
-                showMessage(editProductMessage, 'Ingrese parte del nombre del producto.', true);
-                return;
-            }
-            try {
-                const response = await fetch(`${API_URLS.get_product_by_name}?name=${encodeURIComponent(nameQuery)}`);
-                const products = await response.json();
-                if (!response.ok) throw new Error(products.error || 'Producto no encontrado');
-                // Si hay varios, muestra una lista para elegir
-                if (Array.isArray(products) && products.length > 1) {
-                    // Muestra lista para seleccionar
-                    let options = products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-                    document.getElementById('editProductId').innerHTML = `<select id="selectProductToEdit">${options}</select>`;
-                    document.getElementById('selectProductToEdit').onchange = function() {
-                        const selectedId = this.value;
-                        const selectedProduct = products.find(p => p.id == selectedId);
-                        fillEditProductForm(selectedProduct);
-                    };
-                    fillEditProductForm(products[0]); // Carga el primero por defecto
-                } else if (Array.isArray(products) && products.length === 1) {
-                    fillEditProductForm(products[0]);
-                } else {
-                    throw new Error('Producto no encontrado');
-                }
-            } catch (e) {
-                showMessage(editProductMessage, e.message, true);
-            }
-        });
+    // updateProductStock se encarga de actualizar el stock de un producto
+    window.updateProductStock = async function(productId) { // Hacerla global para el botón
+        const stockInput = document.getElementById(`newStockValue_${productId}`);
+        const stock = parseInt(stockInput.value);
+        if(isNaN(stock) || stock < 0) { showMessage(modifyProductStockMessage, "Stock debe ser un número >= 0.", true); return; }
+        try {
+            // **CORRECCIÓN AQUÍ:** Reemplazamos el '0' en la URL con el ID real del producto.
+            const url = API_URLS.update_product_stock.replace('/0/', `/${productId}/`);
+            const response = await fetch(url, {
+                method: 'PUT', headers: {'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN},
+                body: JSON.stringify({stock})
+            });
+            const data = await response.json();
+            if(!response.ok) throw new Error(data.error || 'Error al actualizar stock');
+            showMessage(modifyProductStockMessage, data.message);
+            productStockDetailsDiv.innerHTML = ''; searchProductNameStockInput.value = '';
+            fetchProducts(); // Refrescar
+        } catch(e){ showMessage(modifyProductStockMessage, e.message, true); }
     }
-    
-    function fillEditProductForm(product) {
-        document.getElementById('editProductId').value = product.id;
-        document.getElementById('editProductName').value = product.name;
-        document.getElementById('editProductDescription').value = product.description || '';
-        document.getElementById('editProductPrice').value = product.price;
-        document.getElementById('editProductStock').value = product.stock;
-        document.getElementById('editProductCategory').value = product.idCategory;
-        // Imagen no se puede precargar por seguridad
-    }
-
-    async function loadProductForEdit(productId) {
-        const response = await fetch(`${API_URLS.get_product_by_name}?id=${productId}`);
-        const product = await response.json();
-        if (!response.ok) throw new Error(product.error || 'Producto no encontrado');
-        document.getElementById('editProductId').value = product.id;
-        document.getElementById('editProductName').value = product.name;
-        document.getElementById('editProductDescription').value = product.description || '';
-        document.getElementById('editProductPrice').value = product.price;
-        document.getElementById('editProductStock').value = product.stock;
-        document.getElementById('editProductCategory').value = product.idCategory;
-        // Imagen no se puede precargar por seguridad
-    }
-
-    document.getElementById('updateProductButton').onclick = async () => {
-        const id = document.getElementById('editProductId').value;
-        const name = document.getElementById('editProductName').value.trim();
-        const description = document.getElementById('editProductDescription').value.trim();
-        const price = document.getElementById('editProductPrice').value;
-        const stock = document.getElementById('editProductStock').value;
-        const category = document.getElementById('editProductCategory').value;
-        const image = document.getElementById('editProductImage').files[0];
-
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('description', description);
-        formData.append('price', price);
-        formData.append('stock', stock);
-        formData.append('category', category);
-        if (image) formData.append('image', image);
-
-        const url = `${API_URLS.products_list_create.replace(/\/$/, '')}/${id}/`;
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-CSRFToken': getCookie('csrftoken') }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Error al actualizar producto');
-        document.getElementById('editProductMessage').textContent = data.message;
-
-        // Limpiar campos del formulario de edición de producto
-        const editProductId = document.getElementById('editProductId');
-        if (editProductId.tagName === 'SELECT') {
-            editProductId.selectedIndex = -1;
-            // Opcional: reemplazar el select por el input original
-            editProductId.outerHTML = '<input id="editProductId" type="number" readonly>';
-        } else {
-            editProductId.value = '';
-        }
-        document.getElementById('editProductName').value = '';
-        document.getElementById('editProductDescription').value = '';
-        document.getElementById('editProductPrice').value = '';
-        document.getElementById('editProductStock').value = '';
-        document.getElementById('editProductCategory').value = '';
-        document.getElementById('editProductImage').value = '';
-    };
 
     // --- Navegación entre secciones Principales (Pedidos, Productos, Usuarios) ---
 
@@ -684,7 +572,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 newProductPriceInput.value = '';
                 newProductStockInput.value = '';
                 addProductMessage.textContent = '';
-            } else if (targetId === 'productsEditSection') {
+            } else if (targetId === 'productsStockSection') {
                 // Limpiar campos de la sección de modificar stock
                 searchProductNameStockInput.value = '';
                 productStockDetailsDiv.innerHTML = '';
