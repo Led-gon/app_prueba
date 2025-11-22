@@ -24,14 +24,26 @@
   </header>
 
   <nav class="dashboard-nav">
-    {% if sections.orders_management %}<button class="nav-button active" data-target="ordersManagementSection">Manejo de Pedidos</button>{% endif %}
-    {% if sections.orders %}<button class="nav-button" data-target="ordersSection">Pedidos</button>{% endif %}
+    {% if sections.orders_management %}
+      <button class="nav-button {% if role == 'Empleado' %}active{% endif %}" data-target="ordersManagementSection">Manejo de Pedidos</button>
+    {% endif %}
+    {% if sections.orders %}
+      <button class="nav-button {% if role != 'Empleado' %}active{% endif %}" data-target="ordersSection">Pedidos</button>
+    {% endif %}
     {% if sections.products %}<button class="nav-button" data-target="productsSection">Productos</button>{% endif %}
     {% if sections.users %}<button class="nav-button" data-target="usersSection">Usuarios</button>{% endif %}
   </nav>
 
+  {% if sections.orders_management %}
+  <section id="ordersManagementSection" class="dashboard-content {% if role == 'Empleado' %}active{% endif %}">
+    <h2>Pedidos Listos para Entregar</h2>
+    <div id="readyOrdersCards"></div>
+    <p id="ordersManagementMessage" class="message"></p>
+  </section>
+  {% endif %}
+
   {% if sections.orders %}
-  <section id="ordersSection" class="dashboard-content active">
+  <section id="ordersSection" class="dashboard-content {% if role != 'Empleado' %}active{% endif %}">
     <h2>Gestión de Pedidos</h2>
     <div class="filters">
       <label>Número de Orden: <input type="number" id="filterOrderId" min="1" placeholder="Ej: 123"></label>
@@ -54,14 +66,6 @@
       <tbody></tbody>
     </table>
     <p id="ordersMessage" class="message"></p>
-  </section>
-  {% endif %}
-
-  {% if sections.orders_management %}
-  <section id="ordersManagementSection" class="dashboard-content">
-    <h2>Pedidos Listos para Entregar</h2>
-    <div id="readyOrdersCards"></div>
-    <p id="ordersManagementMessage" class="message"></p>
   </section>
   {% endif %}
 

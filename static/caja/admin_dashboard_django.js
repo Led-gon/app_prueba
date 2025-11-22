@@ -109,9 +109,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             const data = await response.json();
             if (data.logged_in) {
                 if (data.role === 'Empleado') {
-                // Mostrar la grilla de pedidos listos para entregar
                     navButtons.forEach(btn => btn.classList.remove('active'));
                     sections.forEach(sec => sec.classList.remove('active'));
+                    // Activa por defecto "Manejo de Pedidos"
                     const ordersManagementBtn = document.querySelector('.nav-button[data-target="ordersManagementSection"]');
                     const ordersManagementSection = document.getElementById('ordersManagementSection');
                     if (ordersManagementBtn && ordersManagementSection) {
@@ -119,10 +119,29 @@ document.addEventListener('DOMContentLoaded', async function() {
                         ordersManagementSection.classList.add('active');
                         fetchReadyOrders();
                     }
+                    // Permitir navegación entre ambas secciones
+                    navButtons.forEach(button => {
+                        button.disabled = false;
+                        button.onclick = function() {
+                            navButtons.forEach(btn => btn.classList.remove('active'));
+                            sections.forEach(sec => sec.classList.remove('active'));
+                            this.classList.add('active');
+                            const targetId = this.getAttribute('data-target');
+                            document.getElementById(targetId).classList.add('active');
+                            if (targetId === 'ordersSection') {
+                                fetchOrders();
+                            } else if (targetId === 'ordersManagementSection') {
+                                fetchReadyOrders();
+                            }
+                        };
+                    });
+                    return; // Evita que el bloque de roles admin/superusuario se ejecute
                 }
+
+                               
                 // Aquí se verifica el rol del usuario logueado para mostrar el dashboard apropiado
                 // Si el rol no es válido para el dashboard de administración, redirige al login
-                if (data.role === 'Empleado' || data.role === 'Administrador' || data.role === 'Super Usuario') {
+                if (data.role === 'Administrador' || data.role === 'Super Usuario') {
                     // Si el usuario es Super Usuario, cargar usuarios al inicio.
                     // Esto inicializa el panel correctamente con los datos para su rol.
                     if (data.role === 'Super Usuario') {
@@ -133,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                             fetchUsers(); // Carga usuarios para la pestaña activa
                         }
                     }
-                    // Para empleados y administradores, la gestión de pedidos es la primera pestaña activa por defecto
+                    // Para superusuarios y administradores, la gestión de pedidos es la primera pestaña activa por defecto
                     filterDateInput.value = new Date().toISOString().split('T')[0];
                     fetchOrders(); // Siempre se carga pedidos al inicio
                 } else {
@@ -146,7 +165,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                 // Si no está logueado, redirige al login
                 window.location.href = API_URLS.login || "/";
             }
-        } catch (error) {
+           
+        }catch (error) {
             console.error("Error de sesión en admin dashboard:", error);
             showMessage(ordersMessage, "Error de sesión. Redirigiendo...", true);
             setTimeout(() => window.location.href = API_URLS.login || "/", 2000);
@@ -463,52 +483,54 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Modificar producto
 
     const searchProductNameEditInput = document.getElementById('searchProductNameEdit');
-    const searchProductEditButton = document.getElementById('searchProductEditButton');
-        
     const searchProductSuggestions = document.getElementById('searchProductSuggestions');
-    
-    searchProductNameEditInput.addEventListener('input', async function() {
-        const query = this.value.trim();
-        if (query.length < 2) {
-            searchProductSuggestions.innerHTML = '';
-            searchProductSuggestions.style.display = 'none';
-            return;
-        }
-        try {
-            const response = await fetch(`${API_URLS.get_product_by_name}?name=${encodeURIComponent(query)}`);
-            const products = await response.json();
-            if (!response.ok || !Array.isArray(products) || products.length === 0) {
+    const searchProductEditButton = document.getElementById('searchProductEditButton');
+
+    if (searchProductNameEditInput) {
+        searchProductNameEditInput.addEventListener('input', async function() {
+            const query = this.value.trim();
+            if (query.length < 2) {
                 searchProductSuggestions.innerHTML = '';
                 searchProductSuggestions.style.display = 'none';
                 return;
             }
-            // Renderizar sugerencias
-            searchProductSuggestions.innerHTML = products.map(p =>
-                `<div class="autocomplete-suggestion" data-id="${p.id}">${p.name}</div>`
-            ).join('');
-            searchProductSuggestions.style.display = 'block';
+            try {
+                const response = await fetch(`${API_URLS.get_product_by_name}?name=${encodeURIComponent(query)}`);
+                const products = await response.json();
+                if (!response.ok || !Array.isArray(products) || products.length === 0) {
+                    searchProductSuggestions.innerHTML = '';
+                    searchProductSuggestions.style.display = 'none';
+                    return;
+                }
+                // Renderizar sugerencias
+                searchProductSuggestions.innerHTML = products.map(p =>
+                    `<div class="autocomplete-suggestion" data-id="${p.id}">${p.name}</div>`
+                ).join('');
+                searchProductSuggestions.style.display = 'block';
         
-        } catch (e) {
-            searchProductSuggestions.innerHTML = '';
-            searchProductSuggestions.style.display = 'none';
-        }
-    });
-    
-    searchProductSuggestions.addEventListener('click', function(e) {
-        if (e.target.classList.contains('autocomplete-suggestion')) {
-            searchProductNameEditInput.value = e.target.textContent;
-            searchProductSuggestions.innerHTML = '';
-            searchProductSuggestions.style.display = 'none';
-        }
-    });
+            } catch (e) {
+                searchProductSuggestions.innerHTML = '';
+                searchProductSuggestions.style.display = 'none';
+            }
+        });
+        
+        searchProductNameEditInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                searchProductSuggestions.innerHTML = '';
+                searchProductSuggestions.style.display = 'none';
+            }, 200);
+        });
+    }
 
-    // Opcional: ocultar sugerencias si el input pierde foco
-    searchProductNameEditInput.addEventListener('blur', () => {
-        setTimeout(() => {
-            searchProductSuggestions.innerHTML = '';
-            searchProductSuggestions.style.display = 'none';
-        }, 200);
-    });
+    if (searchProductSuggestions) {
+        searchProductSuggestions.addEventListener('click', function(e) {
+            if (e.target.classList.contains('autocomplete-suggestion')) {
+                searchProductNameEditInput.value = e.target.textContent;
+                searchProductSuggestions.innerHTML = '';
+                searchProductSuggestions.style.display = 'none';
+            }
+        });
+    }
 
     if (searchProductEditButton) {
         searchProductEditButton.addEventListener('click', async () => {
@@ -566,48 +588,61 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Imagen no se puede precargar por seguridad
     }
 
-    document.getElementById('updateProductButton').onclick = async () => {
-        const id = document.getElementById('editProductId').value;
-        const name = document.getElementById('editProductName').value.trim();
-        const description = document.getElementById('editProductDescription').value.trim();
-        const price = document.getElementById('editProductPrice').value;
-        const stock = document.getElementById('editProductStock').value;
-        const category = document.getElementById('editProductCategory').value;
-        const image = document.getElementById('editProductImage').files[0];
+    const updateProductButton = document.getElementById('updateProductButton');
+    if (updateProductButton) {
+        updateProductButton.onclick = async () => {
+            const id = document.getElementById('editProductId').value;
+            if (!id) {
+                showMessage(document.getElementById('editProductMessage'), 'Debes seleccionar un producto antes de modificar.', true);
+                return;
+            }
+            const name = document.getElementById('editProductName').value.trim();
+            const description = document.getElementById('editProductDescription').value.trim();
+            const price = document.getElementById('editProductPrice').value;
+            const stock = document.getElementById('editProductStock').value;
+            const category = document.getElementById('editProductCategory').value;
+            const image = document.getElementById('editProductImage').files[0];
+        
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('description', description);
+            formData.append('price', price);
+            formData.append('stock', stock);
+            formData.append('category', category);
+            if (image) formData.append('image', image);
+        
+            const url = `${API_URLS.products_list_create.replace(/\/$/, '')}/${id}/`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            });
+            let data;
+            try {
+                data = await response.json();
+            } catch (e) {
+                showMessage(document.getElementById('editProductMessage'), 'Error: No se pudo modificar el producto. Verifica que seleccionaste un producto y tienes permisos.', true);
+                return;
+            }
+            if (!response.ok) throw new Error(data.error || 'Error al actualizar producto');
+            document.getElementById('editProductMessage').textContent = data.message;
 
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('description', description);
-        formData.append('price', price);
-        formData.append('stock', stock);
-        formData.append('category', category);
-        if (image) formData.append('image', image);
-
-        const url = `${API_URLS.products_list_create.replace(/\/$/, '')}/${id}/`;
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-CSRFToken': getCookie('csrftoken') }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Error al actualizar producto');
-        document.getElementById('editProductMessage').textContent = data.message;
-
-        // Limpiar campos del formulario de edición de producto
-        const editProductId = document.getElementById('editProductId');
-        if (editProductId.tagName === 'SELECT') {
-            editProductId.selectedIndex = -1;
-            // Opcional: reemplazar el select por el input original
-            editProductId.outerHTML = '<input id="editProductId" type="number" readonly>';
-        } else {
-            editProductId.value = '';
+            // Limpiar campos del formulario de edición de producto
+            const editProductId = document.getElementById('editProductId');
+            if (editProductId.tagName === 'SELECT') {
+                editProductId.selectedIndex = -1;
+                // Opcional: reemplazar el select por el input original
+                editProductId.outerHTML = '<input id="editProductId" type="number" readonly>';
+            } else {
+                editProductId.value = '';
+            }
+            document.getElementById('editProductName').value = '';
+            document.getElementById('editProductDescription').value = '';
+            document.getElementById('editProductPrice').value = '';
+            document.getElementById('editProductStock').value = '';
+            document.getElementById('editProductCategory').value = '';
+            document.getElementById('editProductImage').value = '';
         }
-        document.getElementById('editProductName').value = '';
-        document.getElementById('editProductDescription').value = '';
-        document.getElementById('editProductPrice').value = '';
-        document.getElementById('editProductStock').value = '';
-        document.getElementById('editProductCategory').value = '';
-        document.getElementById('editProductImage').value = '';
     };
 
     // --- Navegación entre secciones Principales (Pedidos, Productos, Usuarios) ---
@@ -638,9 +673,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                     productSections[0].classList.add('active-subtab');
                 }
                 // Limpiar campos de búsqueda de productos
-                searchProductNameStockInput.value = '';
-                productStockDetailsDiv.innerHTML = '';
-                modifyProductStockMessage.textContent = '';
+                if (searchProductNameStockInput) {
+                    searchProductNameStockInput.value = '';
+                }
+                if (productStockDetailsDiv) {
+                    productStockDetailsDiv.innerHTML = '';
+                }
+                if (modifyProductStockMessage) {
+                    modifyProductStockMessage.textContent = '';
+                }
             } else if (targetId === 'usersSection') { // Lógica para Gestión de Usuarios
                 fetchUsers(); // Cargar usuarios al entrar a la sección
                 // Asegurar que una sub-pestaña de usuarios esté activa (generalmente la primera: Listado)
@@ -686,9 +727,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                 addProductMessage.textContent = '';
             } else if (targetId === 'productsEditSection') {
                 // Limpiar campos de la sección de modificar stock
-                searchProductNameStockInput.value = '';
-                productStockDetailsDiv.innerHTML = '';
-                modifyProductStockMessage.textContent = '';
+                if (searchProductNameStockInput) {
+                    searchProductNameStockInput.value = '';
+                }
+                if (productStockDetailsDiv) {
+                    productStockDetailsDiv.innerHTML = '';
+                }
+                if (modifyProductStockMessage) {
+                    modifyProductStockMessage.textContent = '';
+                }
             }
         });
     });

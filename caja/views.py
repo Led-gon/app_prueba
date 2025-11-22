@@ -114,18 +114,20 @@ def determine_dashboard_view(request):
 @role_required(allowed_roles=['Empleado', 'Administrador', 'Super Usuario'])
 def dashboard_view(request):
     role = request.user.role
+
     sections = {
-        'orders': role in ['Empleado', 'Administrador', 'Super Usuario'],
         'orders_management': role in ['Empleado'],
+        'orders': role in ['Empleado', 'Administrador', 'Super Usuario'],
         'products': role in ['Administrador', 'Super Usuario'],
         'users': role in ['Super Usuario'],
     }
-    return render(request, 'caja/admin_dashboard.html', {
-        'user': request.user,
-        'sections': sections,
-        'role': role
-    })
 
+    context = {
+        "role": role,
+        "user": request.user,
+        "sections": sections,
+    }
+    return render(request, 'caja/admin_dashboard.html', context)
 
 # --- API Endpoints ---
 
@@ -305,7 +307,13 @@ def api_products_list_create(request):
 @login_required(login_url='caja:login')
 @role_required(allowed_roles=['Administrador', 'Super Usuario'])
 def api_product_detail_update_delete(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
+
+    if not product_id:
+        return JsonResponse({'error': 'ID de producto faltante.'}, status=400)
+    try:
+        product = Product.objects.get(pk=product_id)
+    except Product.DoesNotExist:
+        return JsonResponse({'error': 'Producto no encontrado.'}, status=404)
 
     if request.method == 'GET':
         return JsonResponse({
