@@ -8,7 +8,6 @@ from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
-from django.db import transaction
 
 @receiver([post_save, post_delete], sender=OrderItem)
 def update_order_amount(sender, instance, **kwargs):
@@ -16,38 +15,6 @@ def update_order_amount(sender, instance, **kwargs):
     total = sum(item.subtotal for item in order.order_items.all())
     order.amount = total
     order.save()
-
-# --- Nuevo: ajustar stock al crear/eliminar OrderItem ---
-@receiver(post_save, sender=OrderItem)
-def decrease_stock_on_orderitem_create(sender, instance, created, **kwargs):
-    """
-    Si se crea un OrderItem, descontar la cantidad del stock del producto.
-    """
-    if not created:
-        return
-    product = instance.product
-    try:
-        # Evitar stock negativo: dejar en 0 si la resta sería menor que 0
-        current = product.stock or 0
-        new_stock = max(current - int(instance.quantity), 0)
-        product.stock = new_stock
-        product.save(update_fields=['stock'])
-    except Exception as e:
-        # Log simple para debugging
-        print("Error al disminuir stock en post_save OrderItem:", e)
-
-@receiver(post_delete, sender=OrderItem)
-def increase_stock_on_orderitem_delete(sender, instance, **kwargs):
-    """
-    Si se elimina un OrderItem, sumar la cantidad al stock del producto.
-    """
-    product = instance.product
-    try:
-        current = product.stock or 0
-        product.stock = current + int(instance.quantity)
-        product.save(update_fields=['stock'])
-    except Exception as e:
-        print("Error al recuperar stock en post_delete OrderItem:", e)
 
 @receiver(pre_save, sender=Order)
 def notificar_cambio_estado(sender, instance, **kwargs):
@@ -79,24 +46,6 @@ def notificar_cambio_estado(sender, instance, **kwargs):
     print(f"status2: {instance.status}")
 
     if old_order.status != instance.status:
-        # Si el nuevo estado es "Cancelado", devolver stock de los items al inventario
-        try:
-            nuevo_estado_nombre = instance.status.name.lower() if instance.status and instance.status.name else ''
-        except Exception:
-            nuevo_estado_nombre = ''
-        if nuevo_estado_nombre == "cancelado":
-            # Usar transaction para mayor consistencia
-            try:
-                with transaction.atomic():
-                    for item in instance.order_items.all():
-                        prod = item.product
-                        if prod:
-                            current = prod.stock or 0
-                            prod.stock = current + int(item.quantity)
-                            prod.save(update_fields=['stock'])
-            except Exception as e:
-                print("Error al restaurar stock por pedido cancelado:", e)
-
         # Datos base
         cliente = instance.customer_name or "Cliente"
         estado = instance.status.name
@@ -193,4 +142,4 @@ def notificar_cambio_estado(sender, instance, **kwargs):
         email.attach_alternative(mensaje_html, "text/html")
         email.send(fail_silently=True)
     else:  return
-
+    
