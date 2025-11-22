@@ -428,7 +428,7 @@ document.querySelectorAll('.plato-item').forEach(plato => {
     if (!desc || !verMas) return;
 
     const lineHeight = parseFloat(getComputedStyle(desc).lineHeight);
-    const maxLines = 3;
+    const maxLines = 2;
     const maxHeight = lineHeight * maxLines;
 
     // Mostrar/ver-más solo si realmente se corta

@@ -9,10 +9,19 @@ body {
 
 /* Header completo con el estilo antiguo */
 .custom-header {
+    width: 100%;
     background-color: #000;
     color: white;
     text-align: center;
-    padding: 1em;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.custom-header.navbar {
+    margin: 0 !important;
+    padding-left: 10px !important;
+    padding-right: 10pc !important;
+    width: 100% !important;
 }
 
 /* H1 dentro del header */
@@ -109,6 +118,7 @@ h3.text-center {
     border-radius: 3%; /* Bordes redondeados para las imágenes */
     margin-bottom: 10px; /* Espacio entre la imagen y el texto */
     height: auto;
+    display: center;
 }
 
 
@@ -137,7 +147,7 @@ h3.text-center {
 .plato-item img {
     width: 100%;
     max-width: 300px;
-    height: auto;
+    height: 270px;
     display: block;
     object-fit: cover;
     margin-bottom: 10px; /* Espacio entre la imagen y el texto */
@@ -163,9 +173,10 @@ h3.text-center {
 .descripcion {
   overflow: hidden;
   line-height: 1.3em;           /* Ajustar según tu estilo */
-  max-height: calc(1.3em * 3);  /* Limita a 3 líneas */
+  max-height: calc(1.3em * 2);  /* Limita a 3 líneas */
   margin-bottom: 0.5em;
   transition: max-height 0.3s ease;
+  min-height: 40px;
 }
 
 .descripcion.expandida {
@@ -197,7 +208,9 @@ h3.text-center {
     text-align: center;
     width: 100%;
     font-size: 0.9em; /* Ajusté el tamaño de la fuente */
-   /* margin-top: auto;  Empuja el botón hacia abajo en el plato */
+    position: relative;
+    margin-top: auto; /* SE PEGA ABAJO SIEMPRE */
+    bottom: 10px;
 }
 
 .item-carrito {
@@ -274,16 +287,11 @@ footer {
     color: white;
     text-align: center;
     padding: 0.8em 0; /* Ajusté el padding */
-    position: fixed;
+    /*position: fixed;*/
     bottom: 0;
     width: 100%;
     font-size: 0.85em; /* Ajusté el tamaño de la fuente */
-    padding-bottom: 0%; /* Elimino el padding inferior para evitar desbordamiento */
-}
-
-.carousel-item img{
-    object-fit: cover;
-    height: 60vh;
+    
 }
 
 /* Media Queries para diferentes tamaños de pantalla */
@@ -294,29 +302,35 @@ footer {
     }
 
     .lista-platos {
-        grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Una sola columna en pantallas pequeñas */
         gap:10px;
     }
 
     .plato-item {
         flex-direction: column; /* Vuelve a la disposición horizontal en pantallas pequeñas para mejor lectura */
-        align-items: flex-start;
+        align-items: stretch;
         text-align: left;
         display: flex;
-        gap: 12px;
+        /*gap: 12px;*/
+        height: 100%;
     }
 
     .plato-item img {
         width: 100%; /* Tamaño fijo para la imagen en la lista en pantallas pequeñas */
         max-width: 300px;
         flex-shrink: 0;
-        height: 200px;
+        height: 130px;
         border-radius: 8px;
         object-fit: cover;
     }
     
   .producto-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
   }
 
     .plato-item > div {
@@ -325,10 +339,14 @@ footer {
 
     .agregar-carrito {
         font-size: 0.8em;
-        padding: 0.5em 1em;
+        width: 100%;
+        padding: 12px;
+        bottom: 10px;
+        position: relative;
+        margin-top: auto;
     }
     .carousel-item img{
-        height: 40vh;
+        height: 35vh;
     }
 
     .btn-lg {
@@ -375,6 +393,30 @@ footer {
         padding: 10px; /* padding reducido en móviles */
     }
 
+    .item-carrito {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 1px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+    .descripcion {
+        min-height: unset !important; /* Ajusta si querés más espacio */
+max-height: calc(1.3em * 2); /* 2 líneas */
+        overflow: hidden;
+    }
+
+    .caption-fija {
+        bottom: 5px;
+        padding: 5px 8px;
+    }
+
+    .caption-fija h5 {
+        font-size: 0.9rem;
+    }
+
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -396,7 +438,7 @@ footer {
 
 .carousel-item img{
     width: 100%;
-    height: 60vh; /* o 40vh en mobile */
+    height: 50vh; /* o 40vh en mobile */
     object-fit: cover;
     transition: none; /* desactiva cualquier transición de zoom */
 }
@@ -404,23 +446,15 @@ footer {
 
 
 
-/*
-.carousel-slide img:hover {
-
-    
-    transform: scale(1.1); Efecto de zoom al pasar el ratón 
-    transition: transform 0.3s ease; Transición suave para el efecto de zoom
-    backface-visibility: hidden; 
-    
-}*/
-
 
 /* ----------------------------Ejemplo----------------------------------------------- */
 
 /* estilos_monitor.css */
 body {
     font-family: Arial, Helvetica, sans-serif;
-    margin: 20px;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
     background-color: #f4f4f4;
     color: #333;
 }
@@ -501,24 +535,6 @@ h2 {
     list-style: none;
     padding: 0;
 }
-
-
-footer {
-    background-color: #000;
-    color: white;
-    text-align: center;
-    padding: 0.8em 0;
-    width: 100%;
-    font-size: 0.85em;
-}
-
-@media (min-width: 769px) {
-    footer {
-        position: fixed;
-        bottom: 0;
-    }
-}
-
 
 img[data-image-key] {
     min-width: var(--imagen-ancho); /* Ancho mínimo de la imagen */
@@ -820,6 +836,9 @@ img[data-image-key] {
 .detalle-producto-info button.agregar-carrito {
     font-size: clamp(0.9rem, 2vw, 1rem);
     padding: clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 18px);
+    bottom: 10px;
+    position: relative;
+    margin-top: auto; /* SE PEGA ABAJO SIEMPRE */
 }
 
 
@@ -842,4 +861,43 @@ img[data-image-key] {
     .detalle-producto-info .agregar-carrito {
         width: 100%;
     }
+}
+
+.caption-fija {
+    background: rgba(0,0,0,0.45);  /* fondo semitransparente para evitar perderse */
+    padding: 8px 12px;
+    border-radius: 8px;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
+    width: fit-content;
+}
+
+/* Texto del nombre del producto */
+.caption-fija h5 {
+    margin: 0;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px #000;
+}
+
+/* Quita el zoom al cambiar de slide */
+.carousel-item {
+    transition: transform 0.7s ease !important;
+    transform: none !important;
+}
+
+/* Evita zoom automático de Bootstrap */
+.carousel-item.active,
+.carousel-item-next,
+.carousel-item-prev {
+    transform: none !important;
+}
+
+/* Desactiva cualquier zoom en la imagen */
+.carousel-item img {
+    transform: none !important;
+    transition: none !important;
 }
