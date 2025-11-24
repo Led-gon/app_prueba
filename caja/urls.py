@@ -19,6 +19,7 @@ urlpatterns = [
     # Orders API
     path('api/orders/', views.api_orders_list_create, name='api_orders_list_create'), # GET para listar, POST para crear (si aplica)
     path('api/orders/<int:order_id>/', views.api_order_detail_update_delete, name='api_order_detail_update_delete'), # GET detalle, PUT update status, DELETE cancel
+    path('api/orders/', views.api_orders_list_create, name='api_orders_list_create'), # GET para listar, POST para crear (si aplica)
 
     # Products API (Admin/Superuser)
     path('api/admin/products/', views.api_products_list_create, name='api_products_list_create'),
@@ -42,6 +43,8 @@ urlpatterns = [
     path('api/payments/create/', views.create_payment, name='api_create_payment'),
     path('api/payments/process_result/', views.process_payment_result, name='api_process_payment_result'),
     path('api/payments/webhook/', views.mercadopago_webhook, name='mercadopago_webhook'),
+
+    path('api/payment_methods/', views.api_payment_methods_list, name='api_payment_methods_list'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

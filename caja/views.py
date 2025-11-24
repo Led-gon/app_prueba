@@ -21,7 +21,7 @@ import json
 from .services import PaymentService
 import json
 
-from .models import CustomUser, Product, Order, OrderItem, State
+from .models import CustomUser, Product, Order, OrderItem, State, Payment, PaymentMethod, PaymentStatus
 
 # --- Decorador de Rol (revisado para Django) ---
 def role_required(allowed_roles=None):
@@ -30,12 +30,11 @@ def role_required(allowed_roles=None):
     def decorator(view_func):
         @login_required(login_url='caja:login')
         def _wrapped_view(request, *args, **kwargs):
-            if not request.user.is_authenticated:
-                return redirect('caja:login') 
+            # Verificar que el usuario tiene atributo role
+            if not hasattr(request.user, 'role'):
+                return HttpResponseForbidden('Rol no determinado.')
             if request.user.role not in allowed_roles:
-                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return JsonResponse({'error': 'Forbidden: Insufficient permissions'}, status=403)
-                return redirect('caja:determine_dashboard') 
+                return HttpResponseForbidden('Permisos insuficientes.')
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
@@ -118,6 +117,7 @@ def dashboard_view(request):
     sections = {
         'orders_management': role in ['Empleado'],
         'orders': role in ['Empleado', 'Administrador', 'Super Usuario'],
+        'new_orders': role in ['Empleado', 'Administrador', 'Super Usuario'],
         'products': role in ['Administrador', 'Super Usuario'],
         'users': role in ['Super Usuario'],
     }
@@ -187,22 +187,98 @@ def api_orders_list_create(request):
             customer_name = data.get('customer_name', '').strip()
             customer_email = data.get('customer_email', '').strip()
             table_number = data.get('table_number')
-            if not table_number or not isinstance(table_number, (int, float)):
+            observations = data.get('observations', '').strip()
+            items = data.get('items', [])  # [{id, cantidad, sugerency}]
+            payment_payload = data.get('payment')  # {payment_method_id, token}
+
+            # Validaciones básicas
+            if table_number is None or (not isinstance(table_number, (int, float)) and not (isinstance(table_number, str) and table_number.isdigit())):
                 return JsonResponse({'error': 'Número de mesa es requerido y debe ser un número.'}, status=400)
 
-            order = Order.objects.create(customer_name=customer_name, customer_email=customer_email, tableNumber=table_number)
+            if not isinstance(items, list) or len(items) == 0:
+                return JsonResponse({'error': 'Debe incluir al menos un item con cantidad > 0.'}, status=400)
+
+            estado = State.objects.first()
+            order = Order.objects.create(
+                customer_name=customer_name,
+                customer_email=customer_email,
+                tableNumber=int(table_number),
+                amount=0,
+                status=estado,
+                initialTime=timezone.now(),
+                order_date=timezone.now().date(),
+                observations=observations
+            )
+
+            total = Decimal('0.00')
+            for it in items:
+                prod_id = it.get('id')
+                cantidad = int(it.get('cantidad', 0))
+                sugerency = it.get('sugerency', '')
+                if not prod_id or cantidad <= 0:
+                    continue
+                try:
+                    producto = Product.objects.get(pk=prod_id)
+                except Product.DoesNotExist:
+                    continue
+                precio = Decimal(producto.price)
+                subtotal = precio * cantidad
+                OrderItem.objects.create(
+                    product=producto,
+                    order=order,
+                    quantity=cantidad,
+                    price=float(precio),
+                    subtotal=float(subtotal),
+                    sugerency=sugerency
+                )
+                total += subtotal
+
+            order.amount = total
+            order.save()
+
+            # Guardar Payment si se envió información
+            if payment_payload:
+                pm_id = payment_payload.get('payment_method_id') or payment_payload.get('id')
+                token = payment_payload.get('token') or payment_payload.get('ticket') or ''
+                payment_method = None
+                if pm_id:
+                    try:
+                        payment_method = PaymentMethod.objects.get(pk=int(pm_id))
+                    except Exception:
+                        payment_method = PaymentMethod.objects.filter(name__icontains=str(pm_id)).first()
+
+                payment_status = PaymentStatus.objects.filter(name__icontains='Pendiente').first() or PaymentStatus.objects.first()
+                if not token:
+                    token = f"order-{order.id}-{int(timezone.now().timestamp())}"
+
+                if payment_method and payment_status:
+                    Payment.objects.create(
+                        idOrder=order,
+                        idPaymentMethod=payment_method,
+                        amount=order.amount,
+                        idPaymentStatus=payment_status,
+                        token=str(token)
+                    )
+
             return JsonResponse({
-                'message': 'Pedido creado', 
-                'order_id': order.id, 
-                'customer_name': order.customer_name,
-                'customer_email': order.customer_email,
-                'table_number': order.tableNumber
+                'message': 'Pedido creado',
+                'order_id': order.id,
+                'total': float(order.amount)
             }, status=201)
         except json.JSONDecodeError:
             return JsonResponse({'error': 'JSON Inválido'}, status=400)
         except IntegrityError:
             return JsonResponse({'error': 'Error de base de datos, posible duplicado.'}, status=409)
-            
+        
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+# Nueva vista: listar métodos de pago
+@login_required(login_url='caja:login')
+def api_payment_methods_list(request):
+    if request.method == 'GET':
+        methods = PaymentMethod.objects.all().order_by('name')
+        data = [{"id": m.id, "name": m.name} for m in methods]
+        return JsonResponse(data, safe=False)
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 @login_required(login_url='caja:login')
@@ -252,25 +328,32 @@ def api_order_detail_update_delete(request, order_id):
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
+# Antes: @role_required(allowed_roles=['Administrador', 'Super Usuario'])
+# Cambiar a login_required para permitir GET a Empleado; controlar POST internamente
 @login_required(login_url='caja:login')
-@role_required(allowed_roles=['Administrador', 'Super Usuario'])
 def api_products_list_create(request):
+    # GET debe estar disponible también para Empleado (lectura de productos para crear pedidos).
+    # POST (crear producto) sigue restringido a Administrador / Super Usuario.
     if request.method == 'GET':
         from collections import defaultdict
         grouped = defaultdict(list)
-        products = Product.objects.select_related('idCategoria').all().order_by('id')
+        products = Product.objects.select_related('idCategoria').filter(stock__gt=0).order_by('id')  # solo disponibles en stock
         for p in products:
             categoria = p.idCategoria.name if p.idCategoria else "Sin categoría"
             grouped[categoria].append({
                 "id": p.id,
                 "name": p.name,
                 "categoria": categoria,
+                "category_id": p.idCategoria.id if p.idCategoria else None,
                 "price": float(p.price),
                 "stock": p.stock,
             })
         return JsonResponse(dict(grouped), safe=False)
-    
+
     elif request.method == 'POST':
+        # POST requiere rol Admin/Super Usuario
+        if request.user.role not in ['Administrador', 'Super Usuario']:
+            return JsonResponse({'error': 'Permisos insuficientes para crear productos.'}, status=403)
         try:
             name = request.POST.get('name', '').strip()
             description = request.POST.get('description', '').strip()
@@ -281,7 +364,7 @@ def api_products_list_create(request):
 
             if not name or price_str is None or stock_str is None or category_id is None:
                 return JsonResponse({'error': 'Nombre, precio, stock y categoria son requeridos'}, status=400)
-            
+
             try:
                 price = Decimal(price_str)
                 stock = int(stock_str)
@@ -298,9 +381,11 @@ def api_products_list_create(request):
                 'message': 'Producto añadido', 
                 'product': {"id": product.id, "name": product.name, "description": product.description, "price": float(product.price), "stock": product.stock, "idCategory": product.idCategoria.id, "image": product.image.url if product.image else None}
             }, status=201)
-        except json.JSONDecodeError: return JsonResponse({'error': 'JSON Inválido'}, status=400)
-        except IntegrityError: return JsonResponse({'error': 'Error de base de datos, posible duplicado.'}, status=409)
-            
+        except IntegrityError:
+            return JsonResponse({'error': 'Error de base de datos, posible duplicado.'}, status=409)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
@@ -518,19 +603,31 @@ def api_guardar_pedido_cliente(request):
             total = 0
             for item in carrito:
                 producto = Product.objects.get(pk=item['id'])
-                cantidad = int(item['cantidad'])
+                cantidad_solicitada = int(item['cantidad'])
+                
+                # --- INICIO DE LA MODIFICACIÓN ---
+                # Calcular el límite máximo permitido
+                limite_maximo = min(10, producto.stock)
+                
+                # Ajustar la cantidad a la que realmente se guardará
+                cantidad_final = min(cantidad_solicitada, limite_maximo)
+                # --- FIN DE LA MODIFICACIÓN ---
+
                 precio = float(producto.price)
-                subtotal = cantidad * precio
+                subtotal = cantidad_final * precio
                 sugerency = item.get('sugerency', '')
-                OrderItem.objects.create(
-                    product=producto,
-                    order=order,
-                    quantity=cantidad,
-                    price=precio,
-                    subtotal=subtotal,
-                    sugerency=sugerency
-                )
-                total += subtotal
+                
+                # Solo crear el item si la cantidad final es mayor a cero
+                if cantidad_final > 0:
+                    OrderItem.objects.create(
+                        product=producto,
+                        order=order,
+                        quantity=cantidad_final, # Usar la cantidad ajustada
+                        price=precio,
+                        subtotal=subtotal,
+                        sugerency=sugerency
+                    )
+                    total += subtotal
 
             order.amount = total
             order.save()

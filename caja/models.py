@@ -90,6 +90,14 @@ class OrderItem(models.Model):
         # If the product is not set, raise an error
         if not self.product:
             raise ValueError("Product must be set for OrderItem.")
+
+        # --- INICIO DE LA MODIFICACIÓN ---
+        # Validar y ajustar la cantidad antes de cualquier otra operación
+        limite_maximo = min(10, self.product.stock)
+        if self.quantity > limite_maximo:
+            self.quantity = limite_maximo
+        # --- FIN DE LA MODIFICACIÓN ---
+
         # If the product's price is not set, use the product's current price
         if not self.price:
             if self.product.stock <= 0:
@@ -97,6 +105,7 @@ class OrderItem(models.Model):
             if self.product.active is False:
                 raise ValueError("Cannot add product to order item because it is not active.")
             self.price = self.product.price
+        
         # Calculate subtotal
         self.subtotal = self.quantity * self.price
         super().save(*args, **kwargs)
@@ -164,6 +173,3 @@ class Payment(models.Model):
 
     def __str__(self):
         return f"Payment {self.id} for Order {self.idOrder.id} - {self.idPaymentMethod.name} - {self.amount}"
-
-
-
