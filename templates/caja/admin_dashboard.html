@@ -30,6 +30,9 @@
     {% if sections.orders %}
       <button class="nav-button {% if role != 'Empleado' %}active{% endif %}" data-target="ordersSection">Pedidos</button>
     {% endif %}
+    {% if sections.new_orders %}
+      <button class="nav-button" data-target="newOrdersSection">Nuevo Pedido</button>
+    {% endif %}
     {% if sections.products %}<button class="nav-button" data-target="productsSection">Productos</button>{% endif %}
     {% if sections.users %}<button class="nav-button" data-target="usersSection">Usuarios</button>{% endif %}
   </nav>
@@ -66,6 +69,31 @@
       <tbody></tbody>
     </table>
     <p id="ordersMessage" class="message"></p>
+  </section>
+  {% endif %}
+  {% if sections.new_orders %}
+  <section id="newOrdersSection" class="dashboard-content">
+    <h2>Crear Nuevo Pedido</h2>
+    <div id="newOrderMessage" class="message"></div>
+    <div class="new-order-form">
+      <label>Cliente: <input id="newOrderCustomerName" type="text" placeholder="Nombre del cliente"></label>
+      <label>Email: <input id="newOrderCustomerEmail" type="email" placeholder="cliente@ejemplo.com"></label>
+      <label>Método de pago:
+        <select id="newOrderPaymentMethod">
+          <option value="">Seleccione</option>
+        </select>
+      </label>
+      <label>Ticket (token): <input id="newOrderTicket" type="text" placeholder="Token/ticket (requerido)"></label>
+      <label>Mesa: <input id="newOrderTableNumber" type="number" min="1" placeholder="Número de mesa"></label>
+      <label>Observaciones: <textarea id="newOrderObservations" rows="2" placeholder="Observaciones (opcional)"></textarea></label>
+      
+      <h3>Productos disponibles</h3>
+      <div id="newOrderCategories" style="margin-bottom:20px;"></div>
+      <div id="newOrderProductsGrid"></div>
+
+      <h3>Total: $<span id="newOrderTotal">0.00</span></h3>
+      <button id="createNewOrderButton">Crear Pedido</button>
+    </div>
   </section>
   {% endif %}
 
@@ -199,7 +227,8 @@ const API_URLS = {
   get_product_by_name: "{% url 'caja:api_get_product_by_name' %}",
   update_product_stock: "{% url 'caja:api_update_product_stock' product_id=0 %}",
   api_superuser_users_list_create: "{% url 'caja:api_superuser_users_list_create' %}",
-  api_superuser_modify_user: "{% url 'caja:api_superuser_modify_user' username='0' %}"
+  api_superuser_modify_user: "{% url 'caja:api_superuser_modify_user' username='0' %}",
+  payment_methods_list: "{% url 'caja:api_payment_methods_list' %}"
 };
 </script>
 <script src="{% static 'caja/admin_dashboard_django.js' %}"></script>

@@ -215,7 +215,7 @@ h3.text-center {
 
 .item-carrito {
     display: grid;
-    grid-template-columns: 2fr 1fr 2fr 0.7fr;
+    grid-template-columns: 2fr 1.3fr 1.5fr 0.7fr 1fr;;
     align-items: center;
     gap: 16px;
     margin-bottom: 10px;
@@ -331,6 +331,7 @@ footer {
     flex-direction: column;
     justify-content: space-between;
     flex-grow: 1;
+    align-items: center;
   }
 
     .plato-item > div {
@@ -900,4 +901,42 @@ img[data-image-key] {
 .carousel-item img {
     transform: none !important;
     transition: none !important;
+}
+
+.control-cantidad {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.btn-cant {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    background: #ff9800;
+    color: white;
+    font-size: 1.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.btn-cant:hover {
+    background: #e68a00;
+}
+
+.btn-cant:active {
+    transform: scale(0.92);
+}
+
+.control-cantidad .cantidad {
+    font-size: 1.1rem;
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+    color: #333;
 }

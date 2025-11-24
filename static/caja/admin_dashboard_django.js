@@ -1118,4 +1118,249 @@ document.addEventListener('DOMContentLoaded', async function() {
         };
     }
     
+    // Nuevos elementos para crear pedidos desde dashboard
+    const newOrderSection = document.getElementById('newOrdersSection');
+    const newOrderCategoriesDiv = document.getElementById('newOrderCategories');
+    const newOrderProductsGrid = document.getElementById('newOrderProductsGrid');
+    const newOrderMessage = document.getElementById('newOrderMessage');
+    const createNewOrderButton = document.getElementById('createNewOrderButton');
+    const newOrderCustomerName = document.getElementById('newOrderCustomerName');
+    const newOrderCustomerEmail = document.getElementById('newOrderCustomerEmail');
+    const newOrderPaymentMethod = document.getElementById('newOrderPaymentMethod');
+    const newOrderTicket = document.getElementById('newOrderTicket');
+    const newOrderTableNumber = document.getElementById('newOrderTableNumber');
+    const newOrderObservations = document.getElementById('newOrderObservations');
+    // seguridad: algunas plantillas podrían no incluir el textarea; usar optional chaining al leer/limpiar
+    const newOrderTotalSpan = document.getElementById('newOrderTotal');
+
+    let productsForNewOrder = {}; // grouped by category
+    let activeCategory = null;
+    const orderSelections = {}; // productId => {cantidad, sugerency, product}
+
+    // Cargar productos para nuevo pedido (se muestran solo con stock>0)
+    async function fetchProductsForNewOrder() {
+        if (!newOrderSection) return;
+        try {
+            newOrderProductsGrid.innerHTML = '<p>Cargando productos...</p>';
+            const response = await fetch(API_URLS.products_list_create);
+            const ct = response.headers.get('content-type') || '';
+            const text = await response.text();
+            if (!response.ok) {
+                newOrderProductsGrid.innerHTML = `<p>Error (${response.status}): ${text}</p>`;
+                return;
+            }
+            if (!ct.includes('application/json')) {
+                newOrderProductsGrid.innerHTML = `<p>Respuesta inesperada del servidor (no JSON). Revise el servidor: ${text}</p>`;
+                return;
+            }
+            const grouped = JSON.parse(text);
+            productsForNewOrder = grouped || {};
+            renderCategories(Object.keys(productsForNewOrder));
+            // seleccionar primera categoría si existe
+            const cats = Object.keys(productsForNewOrder);
+            activeCategory = cats.length ? cats[0] : null;
+            renderProductsGrid(activeCategory);
+            newOrderMessage.textContent = '';
+
+            // Cargar métodos de pago y poblar select
+            try {
+                if (API_URLS.payment_methods_list) {
+                    const pmResp = await fetch(API_URLS.payment_methods_list);
+                    if (pmResp.ok) {
+                        const methods = await pmResp.json();
+                        newOrderPaymentMethod.innerHTML = '<option value="">Seleccione</option>';
+                        methods.forEach(m => {
+                            const opt = document.createElement('option');
+                            opt.value = m.id;
+                            opt.textContent = m.name;
+                            newOrderPaymentMethod.appendChild(opt);
+                        });
+                    } else {
+                        newOrderPaymentMethod.innerHTML = '<option value="">(No hay métodos)</option>';
+                    }
+                }
+            } catch (e) {
+                newOrderPaymentMethod.innerHTML = '<option value="">(Error cargando métodos)</option>';
+            }
+        } catch (e) {
+            newOrderProductsGrid.innerHTML = `<p>Error: ${e.message}</p>`;
+        }
+    }
+
+    function renderCategories(categories) {
+        if (!newOrderCategoriesDiv) return;
+        newOrderCategoriesDiv.innerHTML = '';
+        categories.forEach((cat, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = cat;
+            btn.className = (idx === 0) ? 'category-btn active' : 'category-btn';
+            btn.onclick = () => {
+                document.querySelectorAll('#newOrderCategories .category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeCategory = cat;
+                renderProductsGrid(cat);
+            };
+            newOrderCategoriesDiv.appendChild(btn);
+        });
+    }
+
+    function renderProductsGrid(category) {
+        newOrderProductsGrid.innerHTML = '';
+        if (!category || !productsForNewOrder[category] || productsForNewOrder[category].length === 0) {
+            newOrderProductsGrid.innerHTML = '<p>No hay productos en esta categoría.</p>';
+            return;
+        }
+        const fragment = document.createDocumentFragment();
+        productsForNewOrder[category].forEach(p => {
+            // solo si stock > 0 (backend ya filtra, pero por seguridad)
+            if (!p.stock || p.stock <= 0) return;
+            const card = document.createElement('div');
+            card.className = 'new-order-product-card';
+            card.style.border = '1px solid #ddd';
+            card.style.padding = '10px';
+            card.style.margin = '6px 0';
+            card.style.display = 'flex';
+            card.style.alignItems = 'center';
+            card.style.justifyContent = 'space-between';
+            card.innerHTML = `
+                <div>
+                    <strong>${p.name}</strong> <br><small>$${parseFloat(p.price).toFixed(2)} - Stock: ${p.stock}</small>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <button type="button" class="qty-btn minus" data-id="${p.id}">-</button>
+                    <span id="qty-${p.id}">0</span>
+                    <button type="button" class="qty-btn plus" data-id="${p.id}">+</button>
+                    <input type="text" placeholder="Preferencias" class="sugerency-input-new" data-id="${p.id}" style="margin-left:8px;" />
+                </div>
+            `;
+            fragment.appendChild(card);
+            // inicializar selection
+            if (!orderSelections[p.id]) {
+                orderSelections[p.id] = { cantidad: 0, sugerency: '', product: p };
+            } else {
+                orderSelections[p.id].product = p;
+            }
+        });
+        newOrderProductsGrid.appendChild(fragment);
+
+        // attach events
+        newOrderProductsGrid.querySelectorAll('.qty-btn.plus').forEach(btn => {
+            btn.onclick = (e) => {
+                const id = btn.dataset.id;
+                const sel = orderSelections[id];
+                if (!sel) return;
+                sel.cantidad = Math.min((sel.cantidad || 0) + 1, sel.product.stock);
+                document.getElementById(`qty-${id}`).textContent = sel.cantidad;
+                updateNewOrderTotal();
+            };
+        });
+        newOrderProductsGrid.querySelectorAll('.qty-btn.minus').forEach(btn => {
+            btn.onclick = (e) => {
+                const id = btn.dataset.id;
+                const sel = orderSelections[id];
+                if (!sel) return;
+                sel.cantidad = Math.max((sel.cantidad || 0) - 1, 0);
+                document.getElementById(`qty-${id}`).textContent = sel.cantidad;
+                updateNewOrderTotal();
+            };
+        });
+        newOrderProductsGrid.querySelectorAll('.sugerency-input-new').forEach(input => {
+            input.addEventListener('blur', function() {
+                const id = this.dataset.id;
+                if (!orderSelections[id]) orderSelections[id] = { cantidad: 0, sugerency: '', product: null };
+                orderSelections[id].sugerency = this.value.trim();
+            });
+        });
+    }
+
+    function updateNewOrderTotal() {
+        let total = 0;
+        Object.values(orderSelections).forEach(sel => {
+            if (sel && sel.cantidad > 0 && sel.product) {
+                total += parseFloat(sel.product.price) * sel.cantidad;
+            }
+        });
+        if (newOrderTotalSpan) newOrderTotalSpan.textContent = total.toFixed(2);
+    }
+
+    if (createNewOrderButton) {
+        createNewOrderButton.addEventListener('click', async () => {
+            try {
+                const customer_name = newOrderCustomerName.value.trim();
+                const customer_email = newOrderCustomerEmail.value.trim();
+                const table_number = newOrderTableNumber.value;
+                const observations = (newOrderObservations?.value ?? '').trim();
+
+                if (!table_number) { showMessage(newOrderMessage, 'Número de mesa es requerido.', true); return; }
+
+                const items = Object.values(orderSelections)
+                    .filter(s => s.cantidad > 0)
+                    .map(s => ({ id: s.product.id, cantidad: s.cantidad, sugerency: s.sugerency || '' }));
+
+                if (items.length === 0) { showMessage(newOrderMessage, 'Seleccione al menos un producto con cantidad > 0.', true); return; }
+
+                // PAYMENT: método + token (ticket)
+                const payment_method_id = newOrderPaymentMethod ? newOrderPaymentMethod.value : '';
+                const ticket_token = newOrderTicket ? newOrderTicket.value.trim() : '';
+                if (!payment_method_id) { showMessage(newOrderMessage, 'Seleccione un método de pago.', true); return; }
+                if (!ticket_token) { showMessage(newOrderMessage, 'Ingrese el ticket/token.', true); return; }
+
+                const payload = { customer_name, customer_email, table_number: parseInt(table_number), observations, items,
+                                  payment: { payment_method_id: parseInt(payment_method_id), token: ticket_token } };
+
+                const response = await fetch(API_URLS.orders_list_create, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                    body: JSON.stringify(payload)
+                });
+                const ct = response.headers.get('content-type') || '';
+                const text = await response.text();
+                if (!response.ok) {
+                    if (ct.includes('application/json')) {
+                        const data = JSON.parse(text);
+                        throw new Error(data.error || JSON.stringify(data));
+                    } else {
+                        throw new Error(`Respuesta inesperada: ${text}`);
+                    }
+                }
+                const data = ct.includes('application/json') ? JSON.parse(text) : {};
+                showMessage(newOrderMessage, `Pedido creado (ID ${data.order_id}).`);
+                // limpiar
+                Object.keys(orderSelections).forEach(k => {
+                    orderSelections[k].cantidad = 0;
+                    orderSelections[k].sugerency = '';
+                    const qel = document.getElementById(`qty-${k}`);
+                    if (qel) qel.textContent = '0';
+                    const sinp = document.querySelector(`.sugerency-input-new[data-id="${k}"]`);
+                    if (sinp) sinp.value = '';
+                });
+                newOrderCustomerName.value = '';
+                newOrderCustomerEmail.value = '';
+                newOrderTableNumber.value = '';
+                if (newOrderObservations) newOrderObservations.value = '';
+                if (newOrderPaymentMethod) newOrderPaymentMethod.value = '';
+                if (newOrderTicket) newOrderTicket.value = '';
+                updateNewOrderTotal();
+                fetchOrders(); // refrescar listado de pedidos
+            } catch (e) {
+                showMessage(newOrderMessage, e.message, true);
+            }
+        });
+    }
+
+    // Al navegar a sección "Nuevo Pedido" cargar productos
+    navButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            if (targetId === 'newOrdersSection') {
+                fetchProductsForNewOrder();
+            }
+        });
+    });
+
+    // Si la sección Nuevo Pedido está activa al inicio
+    if (document.getElementById('newOrdersSection')?.classList.contains('active')) {
+        fetchProductsForNewOrder();
+    }
 });

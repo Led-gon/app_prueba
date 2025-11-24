@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (botonAgregar && controlCantidad) {
             if (cantidad > 0) {
                 botonAgregar.style.display = 'none';
-                controlCantidad.style.display = 'inline-block';
+                controlCantidad.style.display = 'flex';
                 controlCantidad.querySelector('.cantidad').textContent = cantidad;
                 console.log(`Producto ${id} cantidad actualizada a ${cantidad}`);
             } else {
@@ -78,47 +78,103 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function mostrarAlerta(mensaje) {
+        const alertaExistente = document.querySelector('.alerta-custom');
+        if (alertaExistente) {
+            alertaExistente.remove();
+        }
+        const alerta = document.createElement('div');
+        alerta.className = 'alerta-custom';
+        alerta.textContent = mensaje;
+        alerta.style.position = 'fixed';
+        alerta.style.top = '20px';
+        alerta.style.left = '50%';
+        alerta.style.transform = 'translateX(-50%)';
+        alerta.style.padding = '12px 25px';
+        alerta.style.background = '#d9534f'; // Un rojo más visible
+        alerta.style.color = 'white';
+        alerta.style.borderRadius = '8px';
+        alerta.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        alerta.style.zIndex = '10001';
+        alerta.style.fontSize = '16px';
+        document.body.appendChild(alerta);
+        setTimeout(() => {
+            alerta.remove();
+        }, 3500);
+    }
+
     function agregarAlCarrito(evento) {
         const boton = evento.target.closest('.agregar-carrito');
         const id = boton.dataset.id;
         const nombre = boton.dataset.nombre;
         const precio = parseFloat(boton.dataset.precio);
-        console.log(`Agregando al carrito: ${nombre} (ID: ${id}, Precio: ${precio})`);
+        const stock = parseInt(boton.dataset.stock, 10);
+        const limite = Math.min(10, stock);
+
+        if (limite === 0) {
+            mostrarAlerta(`El producto "${nombre}" no tiene stock disponible.`);
+            return;
+        }
+
         let carrito = cargarCarrito();
         let item = carrito.find(p => p.id == id);
+
         if (item) {
+            if (item.cantidad >= limite) {
+                mostrarAlerta(`Límite alcanzado para "${nombre}" (${limite} unidades).`);
+                return;
+            }
             item.cantidad += 1;
         } else {
-            carrito.push({ id, nombre, precio, cantidad: 1, sugerency: '' });
+            carrito.push({ id, nombre, precio, cantidad: 1, sugerency: '', stock: parseInt(boton.dataset.stock, 10)});
         }
         guardarCarrito(carrito);
         actualizarCarritoVisual();
-        console.log(`Producto ${nombre} agregado al carrito.`);
     }
 
     function cambiarCantidad(evento, delta) {
         const control = evento.target.closest('.control-cantidad');
         const id = control.dataset.id;
+        const stock = parseInt(control.dataset.stock, 10);
+        const limite = Math.min(10, stock);
+
         let carrito = cargarCarrito();
         let item = carrito.find(p => p.id == id);
-        console.log(`Cambiando cantidad del producto ID ${id} en ${delta}`);
+
         if (item) {
+            if (delta > 0 && item.cantidad >= limite) {
+                mostrarAlerta(`Límite alcanzado (${limite} unidades).`);
+                return;
+            }
+
             item.cantidad += delta;
+
             if (item.cantidad <= 0) {
                 carrito = carrito.filter(p => p.id != id);
             }
             guardarCarrito(carrito);
             actualizarCarritoVisual();
+            if (document.getElementById('lista-de-productos-carrito')) {
+                mostrarCarritoEnPagina();
+            }
         }
-        console.log(`Cantidad del producto ID ${id} actualizada a ${item ? item.cantidad : 0}`);
     }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('mas')) {
+            cambiarCantidad(e, 1);
+        }
+        if (e.target.classList.contains('menos')) {
+            cambiarCantidad(e, -1);
+        }
+    });
 
     // --- Asignar eventos ---
     document.querySelectorAll('.agregar-carrito').forEach(boton => {
         console.log('Asignando evento para agregar al carrito');
         boton.addEventListener('click', agregarAlCarrito);
     });
-
+/*
     document.querySelectorAll('.control-cantidad .mas').forEach(boton => {
         console.log('Asignando evento para aumentar cantidad');
         boton.addEventListener('click', e => cambiarCantidad(e, 1));
@@ -126,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.control-cantidad .menos').forEach(boton => {
         console.log('Asignando evento para disminuir cantidad');
         boton.addEventListener('click', e => cambiarCantidad(e, -1));
-    });
+    });*/
 
     document.querySelectorAll('.sugerency-input').forEach(input => {
         input.addEventListener('blur', function() {
@@ -155,7 +211,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const div = document.createElement('div');
                 div.classList.add('item-carrito');
                 div.innerHTML = `
-                    <span>${item.nombre} x ${item.cantidad}</span>
+                    <span>${item.nombre}</span>
+                    <div class="control-cantidad" data-id="${item.id}" data-stock="${ item.stock }" style="display:flex;align-items:center;gap:10px;">
+                     <button class="menos">-</button>
+                     <span class="cantidad">${item.cantidad}</span>
+                    <button class="mas">+</button>
+                    </div>
                     <span>$${(item.precio * item.cantidad).toFixed(2)}</span>
                     <input type="text" class="sugerency-input" data-id="${item.id}" placeholder="Preferencias (opcional)" value="${item.sugerency || ''}">
                     <button class="eliminar-item" data-id="${item.id}">Eliminar</button>

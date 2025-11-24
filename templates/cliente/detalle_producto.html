@@ -23,13 +23,17 @@ Shatalito - Detalle Producto
             <button class="agregar-carrito"
                 data-id="{{ producto.id }}"
                 data-nombre="{{ producto.name }}"
-                data-precio="{{ producto.price }}">
+                data-precio="{{ producto.price }}"
+                data-stock="{{ producto.stock }}">
                 Agregar al Carrito
             </button>
-            <div class="control-cantidad" data-id="{{ producto.id }}" style="display: none;">
-                <button class="menos">-</button>
+            <div class="control-cantidad"
+                 data-id="{{ producto.id }}"
+                 data-stock="{{ producto.stock }}"
+                 style="display: none;">
+                <button class="btn-cant menos">-</button>
                 <span class="cantidad">1</span>
-                <button class="mas">+</button>
+                <button class="btn-cant mas">+</button>
             </div>
         </div>
     </section>

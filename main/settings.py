@@ -23,11 +23,13 @@ MERCADO_PAGO_ACCESS_TOKEN = 'APP_USR-8220324942115231-101317-339235150338bfe78b4
 MERCADOPAGO_WEBHOOK_URL = 'https://kgvisual.pythonanywhere.com/caja/api/payments/webhook/'
 
 
-DEBUG = False # Déjalo True por ahora para desarrollo
+DEBUG = True # Déjalo True por ahora para desarrollo
 
 ALLOWED_HOSTS = [ 
     'kgvisual.pythonanywhere.com',
     'localhost',
+    '127.0.0.1',
+
 ]
 
 INSTALLED_APPS = [
