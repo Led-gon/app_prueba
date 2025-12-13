@@ -254,9 +254,9 @@ def api_orders_list_create(request):
                 if payment_method and payment_status:
                     Payment.objects.create(
                         idOrder=order,
-                        idPaymentMethod=payment_method,
+                        idPaymentMethod_id=payment_method.id,
                         amount=order.amount,
-                        idPaymentStatus=payment_status,
+                        idPaymentStatus_id=payment_status.id,
                         token=str(token)
                     )
 
@@ -676,9 +676,11 @@ def mercadopago_webhook(request):
         notification = request.POST or json.loads(request.body)
         topic = notification.get('topic') or notification.get('type')
         payment_id = notification.get('data.id') or notification.get('id') or notification.get('payment_id')
+        mp_token = payment_data.get("preference_id")
     elif request.method == 'GET':
         topic = request.GET.get('topic')
         payment_id = request.GET.get('id')
+        mp_token = payment_data.get("preference_id")
     else:
         return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
@@ -689,6 +691,7 @@ def mercadopago_webhook(request):
         payment_data = payment_info.get("response", {})
         mp_status = payment_data.get("status", "pending")
         external_reference = payment_data.get("external_reference")
+        
 
         # Actualiza el estado de la orden y el pago
         from caja.models import Order, Payment, PaymentMethod, PaymentStatus
@@ -703,13 +706,18 @@ def mercadopago_webhook(request):
             mapped_status = status_mapping.get(mp_status, "Pendiente")
             payment_method = PaymentMethod.objects.get(name='Mercado Pago')
             payment_status = PaymentStatus.objects.get(name=mapped_status)
-            Payment.objects.create(
-                idOrder=order,
-                idPaymentMethod=payment_method,
-                amount=order.amount,
-                idPaymentStatus=payment_status,
-                token=str(payment_id)
-            )
+            payment_obj = Payment.objects.filter(idOrder=order, token=mp_token).first()
+            if payment_obj:
+                payment_obj.idPaymentStatus_id = payment_status.id
+                payment_obj.save()
+            else:
+                Payment.objects.create(
+                    idOrder=order,
+                    idPaymentMethod_id=payment_method.id,
+                    amount=order.amount,
+                    idPaymentStatus_id=payment_status.id,
+                    token=mp_token
+                )
             # Actualiza el estado de la orden
             if mp_status == "approved":
                 order.status_id = 2  # En Espera

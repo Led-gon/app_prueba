@@ -77,6 +77,13 @@
         }
     },
     {
+        "model": "caja.PaymentMethod",
+        "pk": 6,
+        "fields": {
+            "name": "Mercado Pago"
+        }
+    },
+    {
         "model": "caja.PaymentStatus",
         "pk": 1,
         "fields": {

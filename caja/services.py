@@ -78,6 +78,7 @@ class PaymentService:
             sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
             payment_info = sdk.payment().get(payment_id)
             payment_data = payment_info.get("response", {})
+            mp_token = payment_data.get("preference_id")
             mp_status = payment_data.get("status", "pending")
             external_reference = payment_data.get("external_reference")
 
@@ -89,15 +90,23 @@ class PaymentService:
                 "cancelled": "Cancelado"
             }
             mapped_status = status_mapping.get(mp_status, "Pendiente")
-            payment_method = PaymentMethod.objects.get(name='Billetera Electrónica')
+            payment_method = PaymentMethod.objects.get(name='Mercado Pago')
             payment_status = PaymentStatus.objects.get(name=mapped_status)
-            Payment.objects.create(
-                idOrder=order,
-                idPaymentMethod=payment_method,
-                amount=order.amount,
-                idPaymentStatus=payment_status,
-                token=str(payment_id)
-            )
+
+            # Buscar el pago existente
+            payment_obj = Payment.objects.filter(idOrder=order, token=mp_token).first()
+            if payment_obj:
+                payment_obj.idPaymentStatus_id = payment_status.id
+                payment_obj.save()
+            else:
+                Payment.objects.create(
+                    idOrder=order,
+                    idPaymentMethod_id=payment_method.id,
+                    amount=order.amount,
+                    idPaymentStatus_id=payment_status.id,
+                    token=mp_token
+                )
+
             # Actualiza el estado de la orden usando el modelo State
             if mp_status == "approved":
                 preparado_state = State.objects.get(name="En espera")
@@ -109,6 +118,7 @@ class PaymentService:
                 cancelado_state = State.objects.get(name="Cancelado")
                 order.status = cancelado_state
             order.save()
+
 
             return {
                 "success": True,
