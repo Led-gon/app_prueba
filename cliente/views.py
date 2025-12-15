@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from caja.models import Product, Category
 from collections import defaultdict
-import random
 
 #--- Vistas para Clientes (Frontend) ---
 

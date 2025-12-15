@@ -19,7 +19,6 @@ urlpatterns = [
     # Orders API
     path('api/orders/', views.api_orders_list_create, name='api_orders_list_create'), # GET para listar, POST para crear (si aplica)
     path('api/orders/<int:order_id>/', views.api_order_detail_update_delete, name='api_order_detail_update_delete'), # GET detalle, PUT update status, DELETE cancel
-    path('api/orders/', views.api_orders_list_create, name='api_orders_list_create'), # GET para listar, POST para crear (si aplica)
 
     # Products API (Admin/Superuser)
     path('api/admin/products/', views.api_products_list_create, name='api_products_list_create'),

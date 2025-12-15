@@ -18,9 +18,6 @@ from decimal import Decimal
 from .services import PaymentService
 import json
 
-from .services import PaymentService
-import json
-
 from .models import CustomUser, Product, Order, OrderItem, State, Payment, PaymentMethod, PaymentStatus
 
 # --- Decorador de Rol (revisado para Django) ---
@@ -259,6 +256,15 @@ def api_orders_list_create(request):
                         idPaymentStatus_id=payment_status.id,
                         token=str(token)
                     )
+              
+            else:
+                Payment.objects.create(
+                    idOrder=order,
+                    idPaymentMethod_id=0,
+                    amount=order.amount,
+                    idPaymentStatus_id=4,  # 'Pendiente'
+                    token=str(token)
+                )
 
             return JsonResponse({
                 'message': 'Pedido creado',
@@ -632,6 +638,7 @@ def api_guardar_pedido_cliente(request):
             order.amount = total
             order.save()
 
+            # NO crear Payment aquí. Se creará luego de obtener el preference_id real en create_payment.
             return JsonResponse({'success': True, 'order_id': order.id})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
@@ -656,6 +663,36 @@ def create_payment(request):
         return JsonResponse({"success": False, "error": "Missing required parameters"}, status=400)
     
     result = PaymentService.create_payment_preference(order_id, return_url)
+
+    # Si la preferencia se creó correctamente, crear el Payment con el preference_id como token
+    if result.get('success') and result.get('payment_id'):
+        try:
+            order = Order.objects.get(id=order_id)
+            payment_method = PaymentMethod.objects.get(name='Mercado Pago')
+            payment_status = PaymentStatus.objects.get(name='Pendiente')
+            token = result['preference_id']
+            external_reference = result.get('external_reference', '')
+            # Evitar duplicados
+            payment_obj = Payment.objects.filter(idOrder=order, token=token).first()
+            if payment_obj.idOrder_id == external_reference:
+                payment_obj.idPaymentStatus = payment_status
+                if payment_obj.idPaymentMethod != payment_method:
+                    payment_obj.idPaymentMethod = payment_method
+                if payment_obj.token != token:
+                    payment_obj.token = token
+                payment_obj.save()
+            else:
+                Payment.objects.create(
+                    idOrder=order,
+                    idPaymentMethod=payment_method,
+                    amount=order.amount,
+                    idPaymentStatus=payment_status,
+                    token=token
+                )
+
+        except Exception as e:
+            print(f"Error creando Payment con preference_id: {e}")
+
     return JsonResponse(result)
 
 @require_http_methods(["POST"])
@@ -676,11 +713,9 @@ def mercadopago_webhook(request):
         notification = request.POST or json.loads(request.body)
         topic = notification.get('topic') or notification.get('type')
         payment_id = notification.get('data.id') or notification.get('id') or notification.get('payment_id')
-        mp_token = payment_data.get("preference_id")
     elif request.method == 'GET':
         topic = request.GET.get('topic')
         payment_id = request.GET.get('id')
-        mp_token = payment_data.get("preference_id")
     else:
         return JsonResponse({"success": False, "error": "Method not allowed"}, status=405)
 
@@ -689,12 +724,11 @@ def mercadopago_webhook(request):
         sdk = mercadopago.SDK(settings.MERCADO_PAGO_ACCESS_TOKEN)
         payment_info = sdk.payment().get(payment_id)
         payment_data = payment_info.get("response", {})
+        mp_token = payment_data.get("preference_id")
         mp_status = payment_data.get("status", "pending")
         external_reference = payment_data.get("external_reference")
-        
 
         # Actualiza el estado de la orden y el pago
-        from caja.models import Order, Payment, PaymentMethod, PaymentStatus
         try:
             order = Order.objects.get(id=external_reference)
             status_mapping = {
@@ -707,17 +741,17 @@ def mercadopago_webhook(request):
             payment_method = PaymentMethod.objects.get(name='Mercado Pago')
             payment_status = PaymentStatus.objects.get(name=mapped_status)
             payment_obj = Payment.objects.filter(idOrder=order, token=mp_token).first()
-            if payment_obj:
+            
+            if payment_obj.idOrder_id == external_reference:
                 payment_obj.idPaymentStatus_id = payment_status.id
+                if payment_obj.idPaymentMethod != payment_method:
+                    payment_obj.idPaymentMethod = payment_method
+                if payment_obj.token != mp_token:
+                    payment_obj.token = mp_token
                 payment_obj.save()
             else:
-                Payment.objects.create(
-                    idOrder=order,
-                    idPaymentMethod_id=payment_method.id,
-                    amount=order.amount,
-                    idPaymentStatus_id=payment_status.id,
-                    token=mp_token
-                )
+                return JsonResponse({"success": False, "error": "No existe Payment para actualizar"}, status=400)
+            
             # Actualiza el estado de la orden
             if mp_status == "approved":
                 order.status_id = 2  # En Espera
@@ -732,3 +766,5 @@ def mercadopago_webhook(request):
         return JsonResponse({"success": True})
 
     return JsonResponse({"success": False, "error": "Datos insuficientes"}, status=400)
+
+

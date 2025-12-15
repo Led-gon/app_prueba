@@ -59,7 +59,7 @@ def notificar_cambio_estado(sender, instance, **kwargs):
             asunto = f"Tu pedido está pendiente de pago⏳"
 
             mensaje_html = f"""
-            <h2 style="color:#2980b9;">Pedido en espera ⏳</h2>
+            <h2 style="color:#2980b9;">Pedido pendiente de pago ⏳</h2>
             <p>Hola {cliente},</p>
             <p>Tu pedido fue recibido y está <strong>pendiente de pago</strong>.</p>
             <p>Si queres reanudarlo, acercate al mostrador del local.</p>

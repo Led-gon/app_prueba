@@ -577,7 +577,7 @@ if (paymentResult) {
                         <p>Recibirás un correo electrónico con los detalles de tu pedido.</p>`;
                 } else {
                     message = `<h2>Pago rechazado</h2>
-                        <p>Por favor, intenta nuevamente con otro método de pago.</p>
+                        <p>Por favor, acercate a la caja para finalizar el pago.</p>
                     <p>Número de Pedido: <strong>${data.order_id || external_reference}</strong></p>`;
                 }
             } else {

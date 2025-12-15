@@ -12,6 +12,7 @@ Shatalito - Pedido Pagado
         <div class="container mt-5">
             <h2>Gracias por tu pedido.</h2>
             <div id="payment-result">
+                <p>Tu numero de pedido es <span id="numero-pedido"></span></p>
                 <p>Procesando resultado del pago...</p>
             </div>
             <a href="{% url 'cliente:index' table=table %}" class="button">Volver al Inicio</a>

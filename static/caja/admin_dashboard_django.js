@@ -1007,10 +1007,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function fetchReadyOrders() {
         showMessage(ordersManagementMessage, 'Cargando pedidos...');
         try {
-            //Para agregar el filtrado por fecha, descomentar las siguientes líneas y comentar la línea del URL actual
-            //const date = new Date().toISOString().split('T')[0];
-            //const url = `${API_URLS.orders_list_create}?date=&status=${READY_STATE_ID}`;
-
             const READY_STATE_ID = 4; // El id de "Listo para Entregar"
             const url = `${API_URLS.orders_list_create}?status=${READY_STATE_ID}`; // <-- Sin date
             const response = await fetch(url);
